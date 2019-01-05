@@ -3,7 +3,7 @@
 """
 sve.utils
 
-This module has utility functions.
+This module contains utility functions related to services.
 
 If adding a service, please try to use the subprocess
   library as little as possible.
@@ -13,12 +13,11 @@ import re
 import sys
 import subprocess as sp
 
-from services import (
-        services_actual,
-        services_configs
+from service_info import (
+        services_sve, services_actual, services_configs
 )
 
-def get_distro():
+def get_os():
     """Get name of OS/distribution.
 
     If the OS is macOS or Windows, then the OS name is returned
@@ -31,6 +30,41 @@ def get_distro():
     # elif sys.platform.startswith("darwin"):
     # elif sys.platform.startswith("win32"):
     return distro
+
+
+def get_existing(distro):
+    """Determine installed services.
+
+    :param distro: Name of OS/Linux distribution.
+    :return existing_srvs: List of existing services (actual names).
+    :rtype: list
+    """
+    unit_files = sp.run(['systemctl', 'list-unit-files'],
+            capture_output=True).stdout.decode()
+    existing_srvs = []
+
+    for service in services_actual[distro].values():
+        if f'{service}.service' in unit_files:
+            existing_srvs.append(service)
+
+    return existing_srvs
+
+
+def get_active(distro):
+    """Determine active services.
+
+    :param distro: Name of OS/Linux distribution.
+    :return active_srvs: Dictionary of services and their activity status.
+    :rtype: dict
+    """
+    active_services = dict()
+
+    for service in services_actual[distro].values():
+        status = sp.run(['systemctl', 'status', service],
+                capture_output=True).stdout.decode()
+        active_services[service] = 'g' if "Active: active" in status else 'r'
+
+    return active_services
 
 
 def get_configs(distro):
@@ -107,81 +141,23 @@ def get_apache_version(distro):
     return apache_ver
 
 
-def get_existing(distro):
-    """Determine installed services.
+def get_versions(distro, services=None):
+    """Get service versions.
 
     :param distro: Name of OS/Linux distribution.
-    :return existing_srvs: List of existing services (actual names).
-    :rtype: list
-    """
-    unit_files = sp.run(['systemctl', 'list-unit-files'],
-            capture_output=True).stdout.decode()
-    existing_srvs = []
-
-    for service in services_actual[distro].values():
-        if f'{service}.service' in unit_files:
-            existing_srvs.append(service)
-
-    return existing_srvs
-
-
-def get_active(distro):
-    """Determine active services.
-
-    :param distro: Name of OS/Linux distribution.
-    :return active_srvs: Dictionary of services and their activity status.
+    :param services: (optional) Services to get versions for.
+    :return versions: Dictionary of services and their version numbers.
     :rtype: dict
     """
-    active_services = dict()
+    versions = {
+            'ftp': get_ftp_version(distro),
+            'ssh': get_ssh_version(distro, services_configs[distro]['ssh']),
+            'apache': get_apache_version(distro)
+    }
 
-    for service in services_actual[distro].values():
-        status = sp.run(['systemctl', 'status', service],
-                capture_output=True).stdout.decode()
-        active_services[service] = 'g' if "Active: active" in status else 'r'
-    
-    return active_services
+    if services:
+        versions = {srv: ver for srv,ver in versions.items() if srv in services}
 
+    return versions
 
-def color(message, clr='n'):
-    """Color a message.
-
-    :param message: Message to color.
-    :param clr: Color to use.
-    :return: Colored :param: `message`.
-    :rtype: str
-    """
-    if clr == 'r':
-        return f'\033[31;1m{message}\033[0m'
-    elif clr == 'g':
-        return f'\033[32;1m{message}\033[0m'
-    elif clr == 'n':
-        return f'\033[1m{message}\033[0m'
-    else:
-        sys.exit(f'error: unknown color: {clr}')
-
-
-def header(title, clr='n', border_type='='):
-    """Draw a header.
-
-    ================= for example =================
-
-    :param title: The header title.
-    :param color: The first letter of the header's color (n is none).
-    :param border_type: The character with which to compose the header.
-    :rtype: None
-    """
-    term_width = int(os.popen('stty size', 'r').read().split()[1])
-
-    if term_width < len(title):
-        sys.exit('error: terminal is too small')
-
-    border_len = (term_width - len(title) - 2) // 2
-    border = border_type * border_len
-
-    if term_width % 2 == 0:
-        extra = '' if len(title) % 2 == 0 else border_type
-    else:
-        extra = '' if len(title) % 2 != 0 else border_type
-
-    print(color(f'{border} {title} {border}{extra}', clr))
 
