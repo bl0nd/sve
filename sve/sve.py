@@ -58,18 +58,53 @@ def parse_services(services):
     return services
 
 
-def check_prereqs(prereqs, prereq_types, srv_file,
-                  vuln_templates, norm_templates):
+def config_exists(regex, config_type, srv_file):
+    """Determine if a config exists.
+
+    :param regex: The regex of the config to look for.
+    :param config_type: The config's type.
+    :param srv_file: The config file.
+    :return: Boolean indicating if the config exists.
+    :rtype: bool
+    """
+    if config_type == 'default':
+        if not re.findall(regex, srv_file):
+            return True
+    elif re.findall(regex, srv_file):
+        return True
+
+    return False
+
+
+def get_error(service, name, desc, regex, config_type, srv_file_text, srv_file, bad_line):
+    """Get line number of vulnerable config."""
+    # It's always going to be a vulnerable default
+    vuln_templates = services_vuln_templates[service]
+
+    # Get line numbers
+    line_nums = []
+    with open(srv_file, 'r') as f:
+        for line_num, line in enumerate(f, 1):
+            if regex.search(line):
+                line_nums.append(f'{line_num}:')
+
+    line_nums = f"{','.join(line_nums).replace(':', '')}:" if line_nums else ''
+    return f"{bad_line}\n{srv_file}:{line_nums} {desc}"
+
+
+def check_prereqs(service, prereqs, prereq_types, srv_file):
     """Count the number of prerequisites satisfied for a configuration.
 
+    :param service: Name of current service.
     :param prereqs: List of config prerequisites.
     :param prereq_types: Types of each config prerequisite.
     :param srv_file: The service's config file.
-    :param vuln_templates: Templates (regexes) for vulnerable prerequisites.
-    :param norm_templates: Templates (regexes) for normal prerequisites.
     :return: Boolean indicating if prerequisites are met.
     :rtype: bool
     """
+    vuln_templates = services_vuln_templates[service]
+    norm_templates = services_norm_templates[service]
+
     if not prereqs:
         return
 
@@ -102,25 +137,24 @@ def get_failures(services, configs):
             prereqs = config['prereq']
             prereq_types = config['prereq_type']
 
-            if config_type == 'default':
-                if not re.findall(regex, srv_file):
-                    if not prereqs or (prereqs and
-                            check_prereqs(prereqs,
-                                          prereq_types, srv_file,
-                                          services_vuln_templates[service],
-                                          services_norm_templates[service])):
-                        bad_line = color(f"E   missing: {config['regex'][1:]}", "r")
-            elif re.findall(regex, srv_file):
+            if config_exists(regex, config_type, srv_file):
                 if not prereqs or (prereqs and
-                            check_prereqs(prereqs,
-                                          prereq_types, srv_file,
-                                          services_vuln_templates[service],
-                                          services_norm_templates[service])):
-                    if config_type == 'special regex':
+                        check_prereqs(service, prereqs, prereq_types, srv_file)):
+                    if config_type == 'default':
+                        bad_line = color(f"E   missing: {config['regex'][1:]}", "r")
+                        print(bad_line)
+                        regex = re.compile(vuln_templates[name], flags=re.MULTILINE)
+                    elif config_type == 'special regex':
                         matches = re.findall(regex,srv_file)
                         bad_line = color(f"E   {', '.join(matches)}", "r")
+                        # print(bad_line)
                     else:
                         bad_line = color(f"E   {config['regex'][1:]}", "r")
+                        # print(bad_line)
+                    error_line = get_error(service, name,
+                        config['description'], regex,
+                        config_type, srv_file, configs[service],
+                        bad_line)
 
 
 def main():
