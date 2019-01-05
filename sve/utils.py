@@ -39,33 +39,37 @@ def get_existing(distro, services=None):
     :param services: (optional) List of services to check for.
     :return existing_srvs: List of existing services (actual names).
     :rtype: list
+
+    TODO:
+        1. Maybe return srv_e instead of srv_a?
     """
     unit_files = sp.run(['systemctl', 'list-unit-files'],
             capture_output=True).stdout.decode()
     existing_srvs = []
 
-    for srv_e,srv_a in services_actual[distro].items():
-        if services and srv_e in services:
-            existing_srvs.append(srv_a)
-        elif not services and f'{srv_a}.service' in unit_files:
+    for srv_e, srv_a in services_actual[distro].items():
+        if (((services and srv_e in services) or not services) and
+                f'{srv_a}.service' in unit_files):
             existing_srvs.append(srv_a)
 
     return existing_srvs
 
 
-def get_active(distro):
+def get_active(distro, services=None):
     """Determine active services.
 
     :param distro: Name of OS/Linux distribution.
+    :param services: (optional) List of services to check for.
     :return active_srvs: Dictionary of services and their activity status.
     :rtype: dict
     """
     active_services = dict()
 
-    for service in services_actual[distro].values():
-        status = sp.run(['systemctl', 'status', service],
-                capture_output=True).stdout.decode()
-        active_services[service] = 'g' if "Active: active" in status else 'r'
+    for srv_e, srv_a in services_actual[distro].items():
+        if (services and srv_e in services) or not services:
+            status = sp.run(['systemctl', 'status', srv_a],
+                    capture_output=True).stdout.decode()
+            active_services[srv_a] = 'g' if "Active: active" in status else 'r'
 
     return active_services
 
