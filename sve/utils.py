@@ -4,6 +4,9 @@
 sve.utils
 
 This module has utility functions.
+
+If adding a service, please try to use the subprocess
+  library as little as possible.
 """
 import os
 import re
@@ -33,7 +36,7 @@ def get_distro():
 def get_configs(distro):
     """Get locations of service config files.
 
-    :param distro: Name of Linux distribution.
+    :param distro: Name of OS/Linux distribution.
     :return configs: Dictionary of services and their config files.
     :rtype: dict
     """
@@ -46,12 +49,13 @@ def get_configs(distro):
 def get_ftp_version(distro):
     """Get version number of FTP.
 
-    :param distro: Name of Linux distribution.
+    :param distro: Name of OS/Linux distribution.
     :return ftp_ver: Version number of FTP.
     :rtype: str
     """
     if distro == 'Arch Linux':
-        ftp_ver_cmd = sp.run(['pacman', '-Q', services_actual[distro]['ftp']], capture_output=True)
+        ftp_ver_cmd = sp.run(['pacman', '-Q', services_actual[distro]['ftp']],
+                capture_output=True)
         ftp_ver = ftp_ver_cmd.stdout.decode().rstrip().split(' ')[1]
     # elif distro == 'darwin':
     # elif distro == 'win32':
@@ -64,7 +68,7 @@ def get_ftp_version(distro):
 def get_ssh_version(distro, ssh_config):
     """Get version number of SSH.
 
-    :param distro: Name of Linux distribution.
+    :param distro: Name of OS/Linux distribution.
     :param ssh_config: Location of SSH configuration file.
     :return ssh_ver: Version number of SSH.
     :rtype: str
@@ -88,7 +92,7 @@ def get_ssh_version(distro, ssh_config):
 def get_apache_version(distro):
     """Get version number of Apache.
 
-    :param distro: Name of Linux distribution.
+    :param distro: Name of OS/Linux distribution.
     :return apache_ver: Version number of Apache.
     :rtype: str
     """
@@ -106,10 +110,12 @@ def get_apache_version(distro):
 def get_existing(distro):
     """Determine installed services.
 
+    :param distro: Name of OS/Linux distribution.
     :return existing_srvs: List of existing services (actual names).
     :rtype: list
     """
-    unit_files = sp.run(['systemctl', 'list-unit-files'], capture_output=True).stdout.decode()
+    unit_files = sp.run(['systemctl', 'list-unit-files'],
+            capture_output=True).stdout.decode()
     existing_srvs = []
 
     for service in services_actual[distro].values():
@@ -117,6 +123,23 @@ def get_existing(distro):
             existing_srvs.append(service)
 
     return existing_srvs
+
+
+def get_active(distro):
+    """Determine active services.
+
+    :param distro: Name of OS/Linux distribution.
+    :return active_srvs: Dictionary of services and their activity status.
+    :rtype: dict
+    """
+    active_services = dict()
+
+    for service in services_actual[distro].values():
+        status = sp.run(['systemctl', 'status', service],
+                capture_output=True).stdout.decode()
+        active_services[service] = 'g' if "Active: active" in status else 'r'
+    
+    return active_services
 
 
 def color(message, clr='n'):
@@ -162,7 +185,3 @@ def header(title, clr='n', border_type='='):
 
     print(color(f'{border} {title} {border}{extra}', clr))
 
-
-print(get_configs(get_distro()))
-print(get_ftp_version(get_distro()))
-print(get_existing(get_distro()))
