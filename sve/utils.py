@@ -11,6 +11,7 @@ If adding a service, please try to use the subprocess
 import os
 import re
 import sys
+import time
 import subprocess as sp
 
 from service_info import (
@@ -208,3 +209,9 @@ def show_service_info(existing_srvs, versions):
 
     # TODO: must do actual tests before printing
 
+
+def get_time(func, *args, **kwargs):
+    start = time.time()
+    func(*args, **kwargs)
+    end = time.time()
+    return round(end - start, 3)

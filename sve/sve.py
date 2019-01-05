@@ -14,7 +14,7 @@ from __version__ import __version__
 from drawing import header
 from utils import (
         get_os, get_existing, get_active, get_versions, get_configs,
-        show_service_info,
+        show_service_info, get_time
 )
 from service_info import services_sve
 
@@ -93,6 +93,11 @@ def main():
     active_srvs = get_active(distro, services)
     configs = get_configs(distro, services)
     versions = get_versions(distro, services)
+
+    # print('existing:', existing_srvs)
+    # print('active:', active_srvs)
+    # print('configs:', configs)
+    # print('versions:', versions)
 
     show_service_info(existing_srvs, versions)
 
