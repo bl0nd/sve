@@ -18,28 +18,6 @@ from utils import (
 )
 from service_info import services_sve
 
-class ArgumentParser(argparse.ArgumentParser):
-    """Overriding class for custom help/message."""
-    def error(self, message):
-        """Custom error messages.
-
-        :param message: The default argparse error message raised.
-        """
-
-    # def print_help(self):
-        # """Print custom help menu."""
-        # print('''\
-# usage: sve [--help] [--services <SERVICES>]
-
-# sve enumerates vulnerable service configurations that probably
-# shouldn't be set on your servers.
-
-    # -h, --help                           Show this help message and exit
-    # --version                            Show this program version and exit
-    # --services SERVICE1[,SERVICE2,...]   Specify services to enumerate
-# ''')
-
-
 def create_parser():
     """Create command-line parser.
 
@@ -51,10 +29,10 @@ def create_parser():
     :rtype: Namespace
 
     TODO:
-        1. Handle bogus arguments passed (e.g., asdf). Right now it
+        1. Handle bogus arguments passed. Right now it
              just acts like you ran with no arguments.
     """
-    parser = ArgumentParser()
+    parser = argparse.ArgumentParser()
 
 
     parser.add_argument('--version', action='store_true', help='Show program version and exit')

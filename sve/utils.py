@@ -14,10 +14,10 @@ import sys
 import time
 import subprocess as sp
 
+from drawing import header
 from service_info import (
         services_sve, services_actual, services_configs
 )
-from drawing import header
 
 def get_os():
     """Get name of OS/distribution.
@@ -215,3 +215,4 @@ def get_time(func, *args, **kwargs):
     func(*args, **kwargs)
     end = time.time()
     return round(end - start, 3)
+
