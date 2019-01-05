@@ -52,7 +52,7 @@ def get_existing(distro, services=None):
     for srv_e, srv_a in services_actual[distro].items():
         if (((services and srv_e in services) or not services) and
                 f'{srv_a}.service' in unit_files):
-            existing_srvs.append(srv_a)
+            existing_srvs.append(srv_e)
 
     return existing_srvs
 

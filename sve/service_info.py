@@ -38,3 +38,49 @@ services_configs = {'Arch Linux':
                      },
                    }
 
+# types: explicit, default, special regex
+# prereq_type: explicit, default, special regex, normal
+services_regex = {
+    'ftp':
+        {
+            'anon ssl': {
+                'description': 'anonymous users may connect using SSL connections',
+                'type': 'explicit',
+                'regex': '^allow_anon_ssl=YES',
+                'prereq': ['anon FTP'],
+                'prereq_type': ['vulnerable default']
+            },
+            'anon FTP': {
+                'description': 'anonymous logins permitted',
+                'type': 'default',
+                'regex': '^anonymous_enable=NO',
+                'prereq': [],
+                'prereq_type': [] 
+            },
+            'local umask': {
+                'description': 'insufficient umask for local user-created files',
+                'type': 'special regex',
+                'regex': '^local_umask=0[0-6][0-6]',
+                'prereq': ['local enable'],
+                'prereq_type': ['normal default']
+            },
+        }
+}
+
+services_vuln_templates = {
+    'ftp':
+        {'anon FTP': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
+         'FTP banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
+        }
+}
+
+# These are for options that aren't considered vulnerable.
+#   For example, local_enable is fine to have but is a
+#   prereq for options that are considered vulnerable.
+#   So we have a template for it here.
+services_norm_templates = {
+    'ftp':
+        {'local enable':'(^local_enable=YES)|(^#+\w*local_enable=.*)'
+        }
+}
+                     
