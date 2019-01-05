@@ -10,6 +10,11 @@ import re
 import sys
 import subprocess as sp
 
+from services import (
+        services_actual,
+        services_configs
+)
+
 def get_distro():
     """Get name of OS/distribution.
 
@@ -32,18 +37,10 @@ def get_configs(distro):
     :return configs: Dictionary of services and their config files.
     :rtype: dict
     """
-    if distro == 'Arch Linux':
-        configs = {'ftp': '/etc/vsftpd.conf',
-                   'ssh': '/etc/ssh/sshd_config',
-                   'apache': '/etc/https/conf/httpd.conf',
-                   'nginx': '/etc/nginx/nginx.conf',
-                   }
-    # elif distro == 'darwin':
-    # elif distro == 'win32':
-    else:
-        sys.exit('error: unknown Linux distribution')
-
-    return configs
+    try:
+        return services_configs[distro]
+    except KeyError:
+        sys.exit(f'error: unknown OS: {distro}')
 
 
 def get_ftp_version(distro):
@@ -54,7 +51,7 @@ def get_ftp_version(distro):
     :rtype: str
     """
     if distro == 'Arch Linux':
-        ftp_ver_cmd = sp.run(['pacman', '-Q', 'vsftpd'], capture_output=True)
+        ftp_ver_cmd = sp.run(['pacman', '-Q', services_actual[distro]['ftp']], capture_output=True)
         ftp_ver = ftp_ver_cmd.stdout.decode().rstrip().split(' ')[1]
     # elif distro == 'darwin':
     # elif distro == 'win32':
@@ -106,15 +103,38 @@ def get_apache_version(distro):
     return apache_ver
 
 
-def color(message, status='n'):
-    if status == 'r':
+def get_existing(distro):
+    """Determine installed services.
+
+    :return existing_srvs: List of existing services (actual names).
+    :rtype: list
+    """
+    unit_files = sp.run(['systemctl', 'list-unit-files'], capture_output=True).stdout.decode()
+    existing_srvs = []
+
+    for service in services_actual[distro].values():
+        if f'{service}.service' in unit_files:
+            existing_srvs.append(service)
+
+    return existing_srvs
+
+
+def color(message, clr='n'):
+    """Color a message.
+
+    :param message: Message to color.
+    :param clr: Color to use.
+    :return: Colored :param: `message`.
+    :rtype: str
+    """
+    if clr == 'r':
         return f'\033[31;1m{message}\033[0m'
-    elif status == 'g':
+    elif clr == 'g':
         return f'\033[32;1m{message}\033[0m'
-    elif status == 'n':
+    elif clr == 'n':
         return f'\033[1m{message}\033[0m'
     else:
-        sys.exit('error: unknown color')
+        sys.exit(f'error: unknown color: {clr}')
 
 
 def header(title, clr='n', border_type='='):
@@ -126,9 +146,6 @@ def header(title, clr='n', border_type='='):
     :param color: The first letter of the header's color (n is none).
     :param border_type: The character with which to compose the header.
     :rtype: None
-
-    TODO:
-        1. Bold
     """
     term_width = int(os.popen('stty size', 'r').read().split()[1])
 
@@ -145,4 +162,7 @@ def header(title, clr='n', border_type='='):
 
     print(color(f'{border} {title} {border}{extra}', clr))
 
-header('test session started', 'n')
+
+print(get_configs(get_distro()))
+print(get_ftp_version(get_distro()))
+print(get_existing(get_distro()))
