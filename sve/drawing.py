@@ -26,12 +26,13 @@ def color(message, clr='n'):
 def header(title, clr='n', border_type='='):
     """Draw a header.
 
-    ================= for example =================
+    ================= an example =================
 
     :param title: The header title.
-    :param color: The first letter of the header's color (n is none).
-    :param border_type: The character with which to compose the header.
-    :rtype: None
+    :param color: (optional) The first letter of the header's color (n is none).
+    :param border_type: (optional) The character with which to compose the header.
+    :return: A header String.
+    :rtype: str
     """
     term_width = int(os.popen('stty size', 'r').read().split()[1])
 
