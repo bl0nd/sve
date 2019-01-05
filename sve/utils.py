@@ -5,6 +5,7 @@ sve.utils
 
 This module has utility functions.
 """
+import os
 import re
 import sys
 import subprocess as sp
@@ -47,7 +48,7 @@ def get_ftp_version(distro):
     """Get version number of FTP.
 
     :param distro: Name of Linux distribution.
-    :return ftp_ver: Version number of FTp.
+    :return ftp_ver: Version number of FTP.
     :rtype: str
     """
     if distro == 'Arch Linux':
@@ -99,4 +100,32 @@ def get_apache_version(distro):
         sys.exit('error: unknown Linux distribution')
 
     return apache_ver
+
+def header(title, color='n', border_type='='):
+    """Draw a header.
+
+    ================= for example =================
+
+    :param title: The header title.
+    :param color: The first letter of the header's color (n is none).
+    :param border_type: The character with which to compose the header.
+    :rtype: None
+
+    TODO:
+        1. Bold
+    """
+    term_width = int(os.popen('stty size', 'r').read().split()[1])
+
+    if term_width < len(title):
+        sys.exit('error: terminal is too small')
+
+    border_len = (term_width - len(title) - 2) // 2
+    border = border_type * border_len
+
+    if term_width % 2 == 0:
+        extra = '' if len(title) % 2 == 0 else border_type
+    else:
+        extra = '' if len(title) % 2 != 0 else border_type
+
+    print(f'{border} {title} {border}{extra}')
 
