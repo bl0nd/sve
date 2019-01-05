@@ -10,17 +10,20 @@ This module does something.
 from __version__ import __version__
 from drawing import header
 from utils import (
-        get_os, get_existing, get_active, get_versions, get_configs
+        get_os, get_existing, get_active, get_versions, get_configs,
+        show_service_info,
 )
 
 def main():
-    header('sve session started')
+    print(header('sve session started'))
     distro = get_os()
     existing_srvs = get_existing(distro)
     active_srvs = get_active(distro)
-    configs = get_configs(distro, services=['ftp', 'ssh', 'asdf', 'fdas'])
-    print(configs)
+    configs = get_configs(distro)
     versions = get_versions(distro)
+
+    # existing_srvs = ['ftp', 'ssh']
+    show_service_info(existing_srvs, versions)
 
 
 if __name__ == '__main__':

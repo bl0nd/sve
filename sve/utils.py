@@ -16,6 +16,7 @@ import subprocess as sp
 from service_info import (
         services_sve, services_actual, services_configs
 )
+from drawing import header
 
 def get_os():
     """Get name of OS/distribution.
@@ -78,6 +79,7 @@ def get_configs(distro, services=None):
     """Get locations of service config files.
 
     :param distro: Name of OS/Linux distribution.
+    :param services: (optional) List of services to grab configs for.
     :return configs: Dictionary of services and their config files.
     :rtype: dict
     """
@@ -174,4 +176,35 @@ def get_versions(distro, services=None):
 
     return versions
 
+
+def get_longest_version(versions):
+    """Calculate the longest version length.
+
+    :param versions: Dictionary of services and their version numbers.
+    :return srv_longest, ver_longest: Tuple containing length of longest
+                                      service and version.
+    :rtype: tuple
+    """
+    srv_longest = 0
+    ver_longest = 0
+
+    for service, version in versions.items():
+        srv_longest = len(service) if len(service) > srv_longest else srv_longest
+        ver_longest = len(version) if len(version) > ver_longest else ver_longest
+
+    return (srv_longest, ver_longest)
+
+
+def show_service_info(existing_srvs, versions):
+    """Show installed services, their version, activity, and test status."""
+    if len(existing_srvs) == 0:
+        print(f"collected 0 items\n\n{header('no tests performed', 'y')}")
+    elif len(existing_srvs) == 1:
+        print(f"collected 1 item\n")
+    else:
+        print(f"collected {len(existing_srvs)} items\n")
+
+    srv_longest, ver_longest = get_longest_version(versions)
+
+    # TODO: must do actual tests before printing
 

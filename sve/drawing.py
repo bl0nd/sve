@@ -15,6 +15,8 @@ def color(message, clr='n'):
         return f'\033[31;1m{message}\033[0m'
     elif clr == 'g':
         return f'\033[32;1m{message}\033[0m'
+    elif clr == 'y':
+        return f'\033[33;1m{message}\033[0m'
     elif clr == 'n':
         return f'\033[1m{message}\033[0m'
     else:
@@ -44,4 +46,4 @@ def header(title, clr='n', border_type='='):
     else:
         extra = '' if len(title) % 2 != 0 else border_type
 
-    print(color(f'{border} {title} {border}{extra}', clr))
+    return color(f'{border} {title} {border}{extra}', clr)
