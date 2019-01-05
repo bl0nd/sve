@@ -32,10 +32,11 @@ def get_os():
     return distro
 
 
-def get_existing(distro):
+def get_existing(distro, services=None):
     """Determine installed services.
 
     :param distro: Name of OS/Linux distribution.
+    :param services: (optional) List of services to check for.
     :return existing_srvs: List of existing services (actual names).
     :rtype: list
     """
@@ -43,9 +44,11 @@ def get_existing(distro):
             capture_output=True).stdout.decode()
     existing_srvs = []
 
-    for service in services_actual[distro].values():
-        if f'{service}.service' in unit_files:
-            existing_srvs.append(service)
+    for srv_e,srv_a in services_actual[distro].items():
+        if services and srv_e in services:
+            existing_srvs.append(srv_a)
+        elif not services and f'{srv_a}.service' in unit_files:
+            existing_srvs.append(srv_a)
 
     return existing_srvs
 
@@ -145,7 +148,7 @@ def get_versions(distro, services=None):
     """Get service versions.
 
     :param distro: Name of OS/Linux distribution.
-    :param services: (optional) Services to get versions for.
+    :param services: (optional) List of services to get versions for.
     :return versions: Dictionary of services and their version numbers.
     :rtype: dict
     """

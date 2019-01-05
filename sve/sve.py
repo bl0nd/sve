@@ -18,7 +18,7 @@ def main():
     distro = get_os()
     existing_srvs = get_existing(distro)
     active_srvs = get_active(distro)
-    versions = get_versions(distro, services=[])
+    versions = get_versions(distro)
 
 
 if __name__ == '__main__':
