@@ -21,9 +21,6 @@ from service_info import services_sve
 def create_parser():
     """Create command-line parser.
 
-    For a custom usage message and error handling, uses an
-      overridden ArgumentParser instance.
-
     :return: A Namespace object containing the command-line flags
                and their state.
     :rtype: Namespace
