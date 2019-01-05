@@ -24,6 +24,7 @@ def get_distro():
     # elif sys.platform.startswith("win32"):
     return distro
 
+
 def get_configs(distro):
     """Get locations of service config files.
 
@@ -44,6 +45,7 @@ def get_configs(distro):
 
     return configs
 
+
 def get_ftp_version(distro):
     """Get version number of FTP.
 
@@ -60,6 +62,7 @@ def get_ftp_version(distro):
         sys.exit('error: unknown Linux distribution')
 
     return ftp_ver
+
 
 def get_ssh_version(distro, ssh_config):
     """Get version number of SSH.
@@ -84,6 +87,7 @@ def get_ssh_version(distro, ssh_config):
 
     return ssh_ver
 
+
 def get_apache_version(distro):
     """Get version number of Apache.
 
@@ -101,7 +105,19 @@ def get_apache_version(distro):
 
     return apache_ver
 
-def header(title, color='n', border_type='='):
+
+def color(message, status='n'):
+    if status == 'r':
+        return f'\033[31;1m{message}\033[0m'
+    elif status == 'g':
+        return f'\033[32;1m{message}\033[0m'
+    elif status == 'n':
+        return f'\033[1m{message}\033[0m'
+    else:
+        sys.exit('error: unknown color')
+
+
+def header(title, clr='n', border_type='='):
     """Draw a header.
 
     ================= for example =================
@@ -127,5 +143,6 @@ def header(title, color='n', border_type='='):
     else:
         extra = '' if len(title) % 2 != 0 else border_type
 
-    print(f'{border} {title} {border}{extra}')
+    print(color(f'{border} {title} {border}{extra}', clr))
 
+header('test session started', 'n')
