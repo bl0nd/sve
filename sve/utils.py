@@ -36,7 +36,7 @@ def get_existing(distro, services=None):
     """Determine installed services.
 
     :param distro: Name of OS/Linux distribution.
-    :param services: (optional) List of services to check for.
+    :param services: (optional) List of existing services to check for.
     :return existing_srvs: List of existing services (actual names).
     :rtype: list
 
@@ -59,7 +59,7 @@ def get_active(distro, services=None):
     """Determine active services.
 
     :param distro: Name of OS/Linux distribution.
-    :param services: (optional) List of services to check for.
+    :param services: (optional) List of active services to check for.
     :return active_srvs: Dictionary of services and their activity status.
     :rtype: dict
     """
@@ -74,15 +74,22 @@ def get_active(distro, services=None):
     return active_services
 
 
-def get_configs(distro):
+def get_configs(distro, services=None):
     """Get locations of service config files.
 
     :param distro: Name of OS/Linux distribution.
     :return configs: Dictionary of services and their config files.
     :rtype: dict
     """
+    configs = dict()
     try:
-        return services_configs[distro]
+        if services:
+            unknown_services = set(services) - set(services_configs[distro].keys())
+            if unknown_services:
+                sys.exit(f"error: unknown service: {', '.join(unknown_services)}")
+            return {srv:cnf for srv,cnf in services_configs[distro].items() if srv in services}
+        else:
+            return services_configs[distro]
     except KeyError:
         sys.exit(f'error: unknown OS: {distro}')
 

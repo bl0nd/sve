@@ -10,7 +10,7 @@ This module does something.
 from __version__ import __version__
 from drawing import header
 from utils import (
-        get_os, get_existing, get_active, get_versions
+        get_os, get_existing, get_active, get_versions, get_configs
 )
 
 def main():
@@ -18,6 +18,8 @@ def main():
     distro = get_os()
     existing_srvs = get_existing(distro)
     active_srvs = get_active(distro)
+    configs = get_configs(distro, services=['ftp', 'ssh', 'asdf', 'fdas'])
+    print(configs)
     versions = get_versions(distro)
 
 
