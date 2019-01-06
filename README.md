@@ -1,12 +1,10 @@
 # sve
 
 
-<p align="center">
 <img src="https://img.shields.io/badge/version-0.1.0-blue.svg">
 <img src="https://img.shields.io/badge/license-MIT-green.svg">
 <!--[![image](https://img.shields.io/badge/contributors.svg)](https://pypi.org/project/sve/)-->
 <!--[![image](https://img.shields.io/badge/vulnerabilities.svg)](https://pypi.org/project/sve/)-->
-</p>
 
 Sve is a community-driven enumeration tool for vulnerable service configurations (and vulnerabilities hopefully soon).
 
