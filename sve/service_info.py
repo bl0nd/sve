@@ -15,32 +15,34 @@ When adding another OS, please use the name given in
   necessary; e.g., 07 for Windows 7).
 """
 
-# Services sve processes by their common names
+# NAMES
 services_sve = ['ftp', 'ssh', 'apache']
 
-# Actual service name
-services_actual = {'Arch Linux':
-                    {
-                       'ftp': 'vsftpd',
-                       'ssh': 'sshd',
-                       'apache': 'httpd',
-                       # 'nginx': 'nginx'
-                    },
-                  }
+services_actual = {
+    'Arch Linux':
+        {
+            'ftp': 'vsftpd',
+            'ssh': 'sshd',
+            'apache': 'httpd',
+            # 'nginx': 'nginx'
+        },
+}
 
-# Service config file locations
-services_configs = {'Arch Linux':
-                     {
-                       'ftp': '/etc/vsftpd.conf',
-                       'ssh': '/etc/ssh/sshd_config',
-                       'apache': '/etc/httpd/conf/httpd.conf',
-                       # 'nginx': '/etc/nginx/nginx.conf'
-                     },
-                   }
 
-# types: explicit, default, special regex
-# prereq_type: explicit, default, special regex, normal
-services_regex = {
+# CONFIG FILE
+services_configs = {
+    'Arch Linux':
+        {
+            'ftp': '/etc/vsftpd.conf',
+            'ssh': '/etc/ssh/sshd_config',
+            'apache': '/etc/httpd/conf/httpd.conf',
+            # 'nginx': '/etc/nginx/nginx.conf'
+        },
+}
+
+
+# ENTRIES
+services_entries = {
     'ftp':
         {
             'anon ssl': {
@@ -73,6 +75,8 @@ services_regex = {
         },
 }
 
+
+# TEMPLATES
 services_vuln_templates = {
     'ftp':
         {'anon FTP': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
