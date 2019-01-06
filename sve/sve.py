@@ -247,13 +247,15 @@ def main():
 
     services = parse_services(args.services) if args.services else []
 
-    print(header('sve session starts'))
+    # Gather facts
     distro = get_os()
     existing_srvs = get_existing(distro, services)
     active_srvs = get_active(distro, services)
     configs = get_configs(distro, services)
     versions = get_versions(distro, services)
 
+    # Start tests
+    print(header('sve session starts'))
     failures = get_failures(existing_srvs, configs, versions)
     show_failures(failures)
 

@@ -29,8 +29,11 @@ def get_os():
     if sys.platform.startswith("linux"):
         with open('/etc/os-release', 'r') as f:
             distro = f.readline().rstrip()[6:-1]
-    # elif sys.platform.startswith("darwin"):
-    # elif sys.platform.startswith("win32"):
+    elif sys.platform.startswith("darwin"):
+        distro = "darwin"
+    elif sys.platform.startswith("win32"):
+        distro = "windows"
+
     return distro
 
 
@@ -43,16 +46,19 @@ def get_existing(distro, services=None):
     :rtype: list
 
     TODO:
-        1. Maybe return srv_e instead of srv_a?
+        1. Systems without systemd.
+        2. Mac/Windows
     """
-    unit_files = sp.run(['systemctl', 'list-unit-files'],
-            capture_output=True).stdout.decode()
     existing_srvs = []
 
-    for srv_e, srv_a in services_actual[distro].items():
-        if (((services and srv_e in services) or not services) and
-                f'{srv_a}.service' in unit_files):
-            existing_srvs.append(srv_e)
+    if sys.platform.startswith("linux"):
+        unit_files = sp.run(['systemctl', 'list-unit-files'],
+                capture_output=True).stdout.decode()
+
+        for srv_e, srv_a in services_actual[distro].items():
+            if (((services and srv_e in services) or not services) and
+                    f'{srv_a}.service' in unit_files):
+                existing_srvs.append(srv_e)
 
     return existing_srvs
 
@@ -67,11 +73,12 @@ def get_active(distro, services=None):
     """
     active_services = dict()
 
-    for srv_e, srv_a in services_actual[distro].items():
-        if (services and srv_e in services) or not services:
-            status = sp.run(['systemctl', 'status', srv_a],
-                    capture_output=True).stdout.decode()
-            active_services[srv_a] = 'g' if "Active: active" in status else 'r'
+    if sys.platform.startswith("linux"):
+        for srv_e, srv_a in services_actual[distro].items():
+            if (services and srv_e in services) or not services:
+                status = sp.run(['systemctl', 'status', srv_a],
+                        capture_output=True).stdout.decode()
+                active_services[srv_a] = 'g' if "Active: active" in status else 'r'
 
     return active_services
 
