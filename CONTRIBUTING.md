@@ -42,8 +42,8 @@ For the commit message, use the following format:
 ```
 
 Examples:
-* New entry for existing service: `anon FTP: add entry`
+* New entry for existing service: `anon FTP: add ftp entry`
 * New service: `ssh: add service`
 * New OS: `macOS: add OS`
-* Revised entry regex: `local umask: revised regex`
-* New templates: `FTP banner: add template`
+* Revised entry regex: `local umask: revised ftp regex`
+* New templates: `FTP banner: add ftp template`
