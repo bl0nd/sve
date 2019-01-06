@@ -196,20 +196,6 @@ def get_longest_version(versions):
     return (srv_longest, ver_longest)
 
 
-def show_service_info(existing_srvs, versions):
-    """Show installed services, their version, activity, and test status."""
-    if len(existing_srvs) == 0:
-        print(f"collected 0 items\n\n{header('no tests performed', 'y')}")
-    elif len(existing_srvs) == 1:
-        print(f"collected 1 item\n")
-    else:
-        print(f"collected {len(existing_srvs)} items\n")
-
-    srv_longest, ver_longest = get_longest_version(versions)
-
-    # TODO: must do actual tests before printing
-
-
 def get_time(func, *args, **kwargs):
     start = time.time()
     func(*args, **kwargs)

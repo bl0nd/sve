@@ -16,7 +16,7 @@ When adding another OS, please use the name given in
 """
 
 # Services sve processes by their common names
-services_sve = ['ftp', 'ssh', 'apache', 'nginx']
+services_sve = ['ftp', 'ssh', 'apache']
 
 # Actual service name
 services_actual = {'Arch Linux':
@@ -24,7 +24,7 @@ services_actual = {'Arch Linux':
                        'ftp': 'vsftpd',
                        'ssh': 'sshd',
                        'apache': 'httpd',
-                       'nginx': 'nginx'
+                       # 'nginx': 'nginx'
                     },
                   }
 
@@ -34,7 +34,7 @@ services_configs = {'Arch Linux':
                        'ftp': '/etc/vsftpd.conf',
                        'ssh': '/etc/ssh/sshd_config',
                        'apache': '/etc/httpd/conf/httpd.conf',
-                       'nginx': '/etc/nginx/nginx.conf'
+                       # 'nginx': '/etc/nginx/nginx.conf'
                      },
                    }
 
@@ -64,14 +64,26 @@ services_regex = {
                 'prereq': ['local enable'],
                 'prereq_type': ['normal default']
             },
-        }
+        },
+    'ssh':
+        {
+        },
+    'apache':
+        {
+        },
 }
 
 services_vuln_templates = {
     'ftp':
         {'anon FTP': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
          'FTP banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
-        }
+        },
+    'ssh':
+        {
+        },
+    'apache':
+        {
+        },
 }
 
 # These are for options that aren't considered vulnerable.
@@ -81,6 +93,12 @@ services_vuln_templates = {
 services_norm_templates = {
     'ftp':
         {'local enable':'(^local_enable=YES)|(^#+\w*local_enable=.*)'
-        }
+        },
+    'ssh':
+        {
+        },
+    'apache':
+        {
+        },
 }
                      

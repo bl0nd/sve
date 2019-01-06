@@ -7,6 +7,7 @@ sve.sve
 This module does something.
 """
 
+import os
 import re
 import sys
 import argparse
@@ -15,12 +16,14 @@ from __version__ import __version__
 from drawing import color, header
 from utils import (
         get_os, get_existing, get_active, get_versions, get_configs,
-        show_service_info, get_time
+        get_time, get_longest_version
 )
 from service_info import (
         services_sve, services_regex, services_vuln_templates,
         services_norm_templates
 )
+
+TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
 
 def create_parser():
     """Create command-line parser.
@@ -122,39 +125,101 @@ def check_prereqs(service, prereqs, prereq_types, srv_file):
     return True
 
 
-def get_failures(services, configs):
-    """Get service test failure information."""
+def show_service_info(service, version):
+    """Show current service and its version."""
+    print(f"{service} ({version})", end=' ')
+
+
+def get_test_status(service, version, test_passed):
+    """Show test status of the current service."""
+    if test_passed:
+        print(color('.', 'g'), end='')
+        return 'passed'
+    else:
+        print(color('F', 'r'), end='')
+        return 'failed'
+
+
+def show_collection_count(items_total):
+    """Display the number of services collected."""
+    if items_total == 0:
+        print(color(f"collected 0 items\n\n{header('no tests performed', 'y')}"))
+    elif items_total == 1:
+        print(color(f"collected 1 item\n"))
+    else:
+        print(color(f"collected {items_total} items\n"))
+
+
+def get_test_stats(pass_count, fail_count):
+    """Show test pass/fail percentage."""
+    if fail_count == 0:
+        percent = 100
+    else:
+        percent = int(pass_count / (pass_count + fail_count) * 100)
+
+    return str(percent)
+
+
+def show_percentage(service, version, configurations, test_stats):
+    # 7: ()[]% and the 2 spaces around ()
+    percentage = get_test_stats(test_stats['passed'], test_stats['failed'])
+    spacing = ' ' * (TERM_WIDTH - (len(service) + len(version) + 7 + len(configurations) + len(percentage)))
+    print(color(f'{spacing}[{percentage}%]', 'b'))
+
+
+def get_failures(services, configs, versions):
+    """Get service test failure information.
+
+    FIXME:
+        1. Having anonymous_enable=NO before anonymous_enable=YES.
+    """
+    # Collection count
+    show_collection_count(len(services))
+
+    # Test each service
     for service in services:
+        # Show service version
+        show_service_info(service, versions[service])
+
+        # Gather config file, configurations, and templates
         with open(configs[service], 'r') as f:
             srv_file = f.read()
         configurations = services_regex[service]
         vuln_templates = services_vuln_templates[service]
         norm_templates = services_norm_templates[service]
+        test_stats = {'passed': 0, 'failed': 0}
 
+        # Test each configuration
         for name, config in configurations.items():
             regex = re.compile(config['regex'], flags=re.MULTILINE)
             config_type = config['type']
             prereqs = config['prereq']
             prereq_types = config['prereq_type']
+            found_config = config_exists(regex, config_type, srv_file)
 
-            if config_exists(regex, config_type, srv_file):
+            # Found a bad config
+            if found_config:
                 if not prereqs or (prereqs and
                         check_prereqs(service, prereqs, prereq_types, srv_file)):
                     if config_type == 'default':
                         bad_line = color(f"E   missing: {config['regex'][1:]}", "r")
-                        print(bad_line)
                         regex = re.compile(vuln_templates[name], flags=re.MULTILINE)
                     elif config_type == 'special regex':
                         matches = re.findall(regex,srv_file)
                         bad_line = color(f"E   {', '.join(matches)}", "r")
-                        # print(bad_line)
                     else:
                         bad_line = color(f"E   {config['regex'][1:]}", "r")
-                        # print(bad_line)
                     error_line = get_error(service, name,
                         config['description'], regex,
                         config_type, srv_file, configs[service],
                         bad_line)
+
+            # Print test status and increment the aggregate
+            test_status = get_test_status(service, versions[service], found_config)
+            test_stats[test_status] += 1
+
+        # Show service test percentage
+        show_percentage(service, versions[service], configurations, test_stats)
 
 
 def main():
@@ -165,20 +230,14 @@ def main():
 
     services = parse_services(args.services) if args.services else []
 
-    print(header('sve session started'))
+    print(header('sve session starts'))
     distro = get_os()
     existing_srvs = get_existing(distro, services)
     active_srvs = get_active(distro, services)
     configs = get_configs(distro, services)
     versions = get_versions(distro, services)
 
-    # print('existing:', existing_srvs)
-    # print('active:', active_srvs)
-    # print('configs:', configs)
-    # print('versions:', versions)
-
-    # show_service_info(existing_srvs, versions)
-    get_failures(existing_srvs, configs)
+    get_failures(existing_srvs, configs, versions)
 
 
 if __name__ == '__main__':

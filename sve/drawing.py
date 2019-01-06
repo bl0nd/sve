@@ -17,6 +17,8 @@ def color(message, clr='n'):
         return f'\033[32;1m{message}\033[0m'
     elif clr == 'y':
         return f'\033[33;1m{message}\033[0m'
+    elif clr == 'b':
+        return f'\033[36;1m{message}\033[0m'
     elif clr == 'n':
         return f'\033[1m{message}\033[0m'
     else:
