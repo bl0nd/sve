@@ -1,5 +1,7 @@
 # sve
 
+<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50741235-de72c500-11bf-11e9-9a90-beafc2676375.png"</p>
+
 [![image](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/bl0nd/sve)
 [![image](https://img.shields.io/badge/license-green-green.svg)](https://github.com/bl0nd/sve)
 <!--[![image](https://img.shields.io/badge/contributors.svg)](https://pypi.org/project/sve/)-->
