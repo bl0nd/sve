@@ -19,7 +19,7 @@ from utils import (
         get_time, get_longest_version
 )
 from service_info import (
-        services_sve, services_regex, services_vuln_templates,
+        services_sve, services_entries, services_vuln_templates,
         services_norm_templates
 )
 
@@ -79,7 +79,7 @@ def config_exists(regex, config_type, srv_file):
     return False
 
 
-def get_error(service, name, desc, regex, config_type, srv_file_text, srv_file, bad_line):
+def get_error(service, name, desc, regex, srv_file, bad_line):
     """Get line number of vulnerable config."""
     # It's always going to be a vulnerable default
     vuln_templates = services_vuln_templates[service]
@@ -189,7 +189,7 @@ def get_failures(services, configs, versions):
         # Gather config file, configurations, and templates
         with open(configs[service], 'r') as f:
             srv_file = f.read()
-        configurations = services_regex[service]
+        configurations = services_entries[service]
         vuln_templates = services_vuln_templates[service]
         norm_templates = services_norm_templates[service]
         test_stats = {'passed': 0, 'failed': 0}
@@ -217,8 +217,7 @@ def get_failures(services, configs, versions):
                         bad_line = color(f"E   {config['regex'][1:]}", "r")
                     error_line = get_error(service, name,
                         config['description'], regex,
-                        config_type, srv_file, configs[service],
-                        bad_line)
+                        configs[service], bad_line)
                     failures[service].append(error_line)
                     uh_oh = True
 
