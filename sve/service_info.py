@@ -1,6 +1,6 @@
 """
-sve.services
-~~~~~~~~~~~~
+sve.service_info
+~~~~~~~~~~~~~~~~
 
 This module contains service information.
 
