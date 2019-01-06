@@ -49,38 +49,38 @@ services_entries = {
                 'description': 'anonymous users may connect using SSL connections',
                 'type': 'explicit',
                 'regex': '^allow_anon_ssl=YES',
-                'prereq': ['anon FTP'],
+                'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
             'anon mkdir': {
                 'description': 'anonymous users may create directories',
                 'type': 'explicit',
                 'regex': '^anon_mkdir_write_enable=YES',
-                'prereq': ['anon FTP'],
+                'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
             'anon write': {
                 'description': 'anonymous users may perform write operations (e.g., deletion, renaming, etc.)',
                 'type': 'explicit',
                 'regex': '^anon_other_write_enable=YES',
-                'prereq': ['anon FTP'],
+                'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
             'anon upload': {
                 'description': 'anonymous users may upload files',
                 'type': 'explicit',
                 'regex': '^anon_upload_enable=YES',
-                'prereq': ['anon FTP'],
+                'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
             'anon world read': {
                 'description': 'anonymous users may download files other than those that are world readable',
                 'type': 'explicit',
                 'regex': '^anon_world_readable_only=NO',
-                'prereq': ['anon FTP'],
+                'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
-            'anon FTP': {
+            'anon enable': {
                 'description': 'anonymous logins permitted',
                 'type': 'default',
                 'regex': '^anonymous_enable=NO',
@@ -171,13 +171,13 @@ services_entries = {
                 'prereq': [],
                 'prereq_type': []
             },
-            # 'banner': {
-                # 'description': 'banner shows version info',
-                # 'type': 'default',
-                # 'regex': '(^ftpd_banner=.*)|(^banner_file=.*)',
-                # 'prereq': [],
-                # 'prereq_type': []
-            # },
+            'banner': {
+                'description': 'banner shows version info',
+                'type': 'default',
+                'regex': '(^ftpd_banner=.*)|(^banner_file=.*)',
+                'prereq': [],
+                'prereq_type': []
+            },
         },
     # 'ssh':
         # {
@@ -191,8 +191,8 @@ services_entries = {
 # TEMPLATES
 services_vuln_templates = {
     'ftp':
-        {'anon FTP': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
-         'FTP banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
+        {'anon enable': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
+         'banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
         },
     # 'ssh':
         # {
