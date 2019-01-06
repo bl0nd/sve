@@ -130,9 +130,9 @@ def show_service_info(service, version):
     print(f"{service} ({version})", end=' ')
 
 
-def get_test_status(service, version, test_passed):
+def get_test_status(service, version, uh_oh):
     """Show test status of the current service."""
-    if test_passed:
+    if not uh_oh:
         print(color('.', 'g'), end='')
         return 'passed'
     else:
@@ -173,11 +173,16 @@ def get_failures(services, configs, versions):
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.
     """
+    failures = {}
+
     # Collection count
     show_collection_count(len(services))
 
     # Test each service
     for service in services:
+        # Initialize failure dict
+        failures[service] = []
+
         # Show service version
         show_service_info(service, versions[service])
 
@@ -196,6 +201,7 @@ def get_failures(services, configs, versions):
             prereqs = config['prereq']
             prereq_types = config['prereq_type']
             found_config = config_exists(regex, config_type, srv_file)
+            uh_oh = False
 
             # Found a bad config
             if found_config:
@@ -213,13 +219,24 @@ def get_failures(services, configs, versions):
                         config['description'], regex,
                         config_type, srv_file, configs[service],
                         bad_line)
+                    failures[service].append(error_line)
+                    uh_oh = True
 
             # Print test status and increment the aggregate
-            test_status = get_test_status(service, versions[service], found_config)
+            test_status = get_test_status(service, versions[service], uh_oh)
             test_stats[test_status] += 1
 
         # Show service test percentage
         show_percentage(service, versions[service], configurations, test_stats)
+
+    return failures
+
+def show_failures(failures):
+    print(f"\n{header('FAILURES')}")
+    for service, failures in failures.items():
+        print(f"{header(f'test_{service}', clr='r', border_type='_')}\n")
+        for error in failures:
+            print(f'{error}\n')
 
 
 def main():
@@ -237,7 +254,8 @@ def main():
     configs = get_configs(distro, services)
     versions = get_versions(distro, services)
 
-    get_failures(existing_srvs, configs, versions)
+    failures = get_failures(existing_srvs, configs, versions)
+    show_failures(failures)
 
 
 if __name__ == '__main__':
