@@ -175,8 +175,8 @@ def get_versions(distro, services=None):
     """
     versions = {
             'ftp': get_ftp_version(distro),
-            'ssh': get_ssh_version(distro, services_configs[distro]['ssh']),
-            'apache': get_apache_version(distro)
+            # 'ssh': get_ssh_version(distro, services_configs[distro]['ssh']),
+            # 'apache': get_apache_version(distro)
     }
 
     if services:
