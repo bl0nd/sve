@@ -7,7 +7,7 @@
 
 Sve is a community-driven enumeration tool for vulnerable service configurations (and vulnerabilities hopefully soon).
 
-Whether you're new to system hardening or a veteran sysadmin, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
+Whether you're new to system hardening or a veteran system administrator, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
 
 
 ## Services
