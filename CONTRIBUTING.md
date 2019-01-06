@@ -4,7 +4,7 @@ All sve entries are stored right here on Github in [*service_info.py*](https://g
 
 
 ## Style
-For information on the style of sve entries, please refer to the [Style Guide](https://github.com/bl0nd/sve/blob/master/contributing-guides/style-guide.md)
+For information on the style of sve entries, please refer to the [Style Guide](https://github.com/bl0nd/sve/blob/master/contributing-guides/style-guide.md).
 
 
 ## Pull Requests
