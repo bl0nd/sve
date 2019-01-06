@@ -1,6 +1,5 @@
 # sve
 
-<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50741235-de72c500-11bf-11e9-9a90-beafc2676375.png"></p>
 
 <p align="center">
 <img src="https://img.shields.io/badge/version-0.1.0-blue.svg">
@@ -12,6 +11,8 @@
 Sve is a community-driven enumeration tool for vulnerable service configurations (and vulnerabilities hopefully soon).
 
 Whether you're new to system hardening or a veteran system administrator, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
+
+<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50741235-de72c500-11bf-11e9-9a90-beafc2676375.png"></p>
 
 
 ## Services
