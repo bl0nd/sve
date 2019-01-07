@@ -16,6 +16,7 @@ Whether you're new to system hardening or a veteran system administrator, sve is
 ## Services
 Currently, covered services include:
 * `FTP`
+* `SSH`
 
 
 ## Contributing
