@@ -64,6 +64,13 @@ def parse_services(services):
 def get_failures(services, configs, versions):
     """Get service test failure information.
 
+    :param services: List of existing services or user-specified services.
+    :param configs: Dictionary of config file locations for each OS. 
+    :param versions: Dictionary of each service and their version.
+    :return failures, passed: A dictionary of each failed entry and its error message,
+                                and the number of passed tests.
+    :rtype: dict, int
+
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.
     """
@@ -129,6 +136,14 @@ def get_failures(services, configs, versions):
 
 
 def show_failures(services, configs, versions, total_services):
+    """Get failures and display results.
+
+    :param services: List of existing services or user-specified services.
+    :param configs: Dictionary of config file locations for each OS. 
+    :param versions: Dictionary of each service and their version.
+    :param total_services: Number of services that sve has tests for.
+    :return: None
+    """
     start = time.time()
     failures, passed = get_failures(services, configs, versions)
     total_time = round(time.time() - start, 3)

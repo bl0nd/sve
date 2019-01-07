@@ -26,8 +26,10 @@ def get_os():
 
     If the OS is macOS or Windows, then the OS name is returned
       instead of a distribution name.
+
+    :return distro: Name of operating system or Linux distribution.
+    :rtype: str
     """
-    system_os = sys.platform
     if sys.platform.startswith("linux"):
         with open('/etc/os-release', 'r') as f:
             distro = f.readline().rstrip()[6:-1]
@@ -240,7 +242,19 @@ def config_exists(regex, config_type, srv_file):
 
 
 def get_error(service, name, desc, regex, srv_file, bad_line):
-    """Get line number of vulnerable config."""
+    """Get line number of vulnerable config.
+
+    :param service: Name of the current service.
+    :param name: Name of the current configuration.
+    :param desc: The current configuration's description.
+    :param regex: The current configuration's regex pattern.
+    :param srv_file: The config file name.
+    :param bad_line: The offending configuration in an error message.
+    :return: An error line including :param: `bad_line`, the file and
+               line number where the configuration was found, and a
+               brief description.
+    :rtype: str
+    """
     # It's always going to be a vulnerable default
     vuln_templates = services_vuln_templates[service]
 
@@ -286,12 +300,24 @@ def check_prereqs(service, prereqs, prereq_types, srv_file):
 
 
 def show_service_info(service, version):
-    """Show current service and its version."""
+    """Show current service and its version.
+
+    :param service: Name of the current service.
+    :param versions: The version of the current service.
+    :return: None
+    """
     print(f"{service} ({version})", end=' ')
 
 
 def get_test_status(service, version, uh_oh):
-    """Show test status of the current service."""
+    """Show test status of the current service.
+
+    :param service: Name of the current service.
+    :param versions: The version of the current service.
+    :param uh_oh: Status of the current test (True or False).
+    :return: A string indicating whether the test passed or failed.
+    :rtype: str
+    """
     if not uh_oh:
         print(color('.', 'g'), end='')
         return 'passed'
@@ -301,7 +327,12 @@ def get_test_status(service, version, uh_oh):
 
 
 def show_collection_count(entries):
-    """Display the number of services collected."""
+    """Display the number of services collected.
+
+    :param entries: Dictionary of configuration entries for all services.
+    :return count: Number of services with tests.
+    :rtype: int
+    """
     count = 0
 
     if not all(entries):
@@ -319,7 +350,13 @@ def show_collection_count(entries):
 
 
 def get_test_stats(pass_count, fail_count):
-    """Show test pass/fail percentage."""
+    """Show test pass/fail percentage.
+
+    :param pass_count: The number of tests passed.
+    :param fail_count: The number of tests failed.
+    :return: Pass/fail percentage.
+    :rtype: str
+    """
     if fail_count == 0:
         percent = 100
     else:
@@ -329,6 +366,13 @@ def get_test_stats(pass_count, fail_count):
 
 
 def show_percentage(service, version, configurations, test_stats):
+    """
+
+    :param services: List of existing services or user-specified services.
+    :param versions: Dictionary of each service and their version.
+    :param configurations: 
+    :param test_stats: Dictionary containing the number of passed and failed tests.
+    """
     # 7: ()[]% and the 2 spaces around ()
     percentage = get_test_stats(test_stats['passed'], test_stats['failed'])
     spacing = ' ' * (TERM_WIDTH - (len(service) + len(version) + 7 + len(configurations) + len(percentage)))
