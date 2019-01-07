@@ -6,7 +6,7 @@
 <!--[![image](https://img.shields.io/badge/contributors.svg)](https://pypi.org/project/sve/)-->
 <!--[![image](https://img.shields.io/badge/vulnerabilities.svg)](https://pypi.org/project/sve/)-->
 
-Sve is a community-driven enumeration tool for vulnerable service configurations (and vulnerabilities hopefully soon).
+Sve is a community-driven enumeration tool for vulnerable service configurations.
 
 Whether you're new to system hardening or a veteran system administrator, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
 
