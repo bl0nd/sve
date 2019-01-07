@@ -25,8 +25,6 @@ from service_info import (
         services_norm_templates
 )
 
-TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
-
 def create_parser():
     """Create command-line parser.
 
