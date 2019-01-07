@@ -11,7 +11,6 @@ If adding a service, please try to use the subprocess
 import os
 import re
 import sys
-import time
 import subprocess as sp
 
 from drawing import color, header
@@ -21,13 +20,6 @@ from service_info import (
 )
 
 TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
-
-def get_time(func, *args, **kwargs):
-    start = time.time()
-    func(*args, **kwargs)
-    end = time.time()
-    return round(end - start, 3)
-
 
 def get_os():
     """Get name of OS/distribution.
@@ -308,14 +300,22 @@ def get_test_status(service, version, uh_oh):
         return 'failed'
 
 
-def show_collection_count(items_total):
+def show_collection_count(entries):
     """Display the number of services collected."""
-    if items_total == 0:
+    count = 0
+
+    if not all(entries):
         print(color(f"collected 0 items\n\n{header('no tests performed', 'y')}"))
-    elif items_total == 1:
-        print(color(f"collected 1 item\n"))
     else:
-        print(color(f"collected {items_total} items\n"))
+        for entry in entries.values():
+            count += 1 if any(entry) else 0
+
+        if count == 1:
+            print(color(f"collected 1 item\n"))
+        else:
+            print(color(f"collected {count} items\n"))
+
+    return count
 
 
 def get_test_stats(pass_count, fail_count):
