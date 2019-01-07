@@ -14,10 +14,20 @@ import sys
 import time
 import subprocess as sp
 
-from drawing import header
+from drawing import color, header
 from service_info import (
-        services_sve, services_actual, services_configs
+        services_sve, services_actual, services_configs,
+        services_vuln_templates, services_norm_templates
 )
+
+TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
+
+def get_time(func, *args, **kwargs):
+    start = time.time()
+    func(*args, **kwargs)
+    end = time.time()
+    return round(end - start, 3)
+
 
 def get_os():
     """Get name of OS/distribution.
@@ -203,9 +213,123 @@ def get_longest_version(versions):
     return (srv_longest, ver_longest)
 
 
-def get_time(func, *args, **kwargs):
-    start = time.time()
-    func(*args, **kwargs)
-    end = time.time()
-    return round(end - start, 3)
+def parse_services(services):
+    """Parse provided services into a list.
 
+    :param services: String of comma-delimited services.
+    :return services: List of services.
+    :rtype: list
+    """
+    services = services.split(',')
+
+    unknown_services = set(services) - set(services_sve)
+    if unknown_services:
+        sys.exit(f"unknown services: {', '.join(unknown_services)}")
+
+    return services
+
+
+def config_exists(regex, config_type, srv_file):
+    """Determine if a config exists.
+
+    :param regex: The regex of the config to look for.
+    :param config_type: The config's type.
+    :param srv_file: The config file.
+    :return: Boolean indicating if the config exists.
+    :rtype: bool
+    """
+    if config_type == 'default':
+        if not re.findall(regex, srv_file):
+            return True
+    elif re.findall(regex, srv_file):
+        return True
+
+    return False
+
+
+def get_error(service, name, desc, regex, srv_file, bad_line):
+    """Get line number of vulnerable config."""
+    # It's always going to be a vulnerable default
+    vuln_templates = services_vuln_templates[service]
+
+    # Get line numbers
+    line_nums = []
+    with open(srv_file, 'r') as f:
+        for line_num, line in enumerate(f, 1):
+            if regex.search(line):
+                line_nums.append(f'{line_num}:')
+
+    line_nums = f"{','.join(line_nums).replace(':', '')}:" if line_nums else ''
+    return f"{bad_line}\n{srv_file}:{line_nums} {desc}"
+
+
+def check_prereqs(service, prereqs, prereq_types, srv_file):
+    """Count the number of prerequisites satisfied for a configuration.
+
+    :param service: Name of current service.
+    :param prereqs: List of config prerequisites.
+    :param prereq_types: Types of each config prerequisite.
+    :param srv_file: The service's config file.
+    :return: Boolean indicating if prerequisites are met.
+    :rtype: bool
+    """
+    vuln_templates = services_vuln_templates[service]
+    norm_templates = services_norm_templates[service]
+
+    if not prereqs:
+        return
+
+    satisfied = 0
+    for prereq, prereq_type in zip(prereqs, prereq_types):
+        templates = vuln_templates if prereq_type.startswith('vulnerable') else norm_templates
+        regex = re.compile(templates[prereq], flags=re.MULTILINE)  # re.MULTILINE is so ^ works
+        if re.findall(regex, srv_file):
+            satisfied += 1
+            break
+
+    if satisfied != len(prereqs):
+        return False
+
+    return True
+
+
+def show_service_info(service, version):
+    """Show current service and its version."""
+    print(f"{service} ({version})", end=' ')
+
+
+def get_test_status(service, version, uh_oh):
+    """Show test status of the current service."""
+    if not uh_oh:
+        print(color('.', 'g'), end='')
+        return 'passed'
+    else:
+        print(color('F', 'r'), end='')
+        return 'failed'
+
+
+def show_collection_count(items_total):
+    """Display the number of services collected."""
+    if items_total == 0:
+        print(color(f"collected 0 items\n\n{header('no tests performed', 'y')}"))
+    elif items_total == 1:
+        print(color(f"collected 1 item\n"))
+    else:
+        print(color(f"collected {items_total} items\n"))
+
+
+def get_test_stats(pass_count, fail_count):
+    """Show test pass/fail percentage."""
+    if fail_count == 0:
+        percent = 100
+    else:
+        percent = int(pass_count / (pass_count + fail_count) * 100)
+
+    return str(percent)
+
+
+def show_percentage(service, version, configurations, test_stats):
+    # 7: ()[]% and the 2 spaces around ()
+    percentage = get_test_stats(test_stats['passed'], test_stats['failed'])
+    spacing = ' ' * (TERM_WIDTH - (len(service) + len(version) + 7 + len(configurations) + len(percentage)))
+    print(color(f'{spacing}[{percentage}%]', 'b'))
