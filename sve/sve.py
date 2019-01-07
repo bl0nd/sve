@@ -13,7 +13,7 @@ import time
 import argparse
 
 from __version__ import __version__
-from drawing import color, header
+from output import color, header
 from utils import (
         get_os, get_existing, get_active, get_configs, get_versions,
         show_collection_count, show_service_info, config_exists, check_prereqs,

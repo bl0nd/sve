@@ -13,7 +13,7 @@ import re
 import sys
 import subprocess as sp
 
-from drawing import color, header
+from output import color, header
 from service_info import (
         services_sve, services_actual, services_configs,
         services_vuln_templates, services_norm_templates
