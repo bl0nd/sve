@@ -10,7 +10,7 @@ Sve is a community-driven enumeration tool for vulnerable service configurations
 
 Whether you're new to system hardening or a veteran system administrator, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
 
-<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50744489-2d812000-11e9-11e9-9c9f-3b38f79c17d2.png"></p>
+<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50747864-d769a800-11fb-11e9-9220-ba7e9c83482c.png"></p>
 
 
 ## Services
