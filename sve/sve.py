@@ -17,11 +17,10 @@ from output import color, header
 from utils import (
         get_os, get_existing, get_active, get_configs, get_versions,
         show_collection_count, show_service_info, config_exists, check_prereqs,
-        get_error, get_test_status, show_percentage
+        get_error, show_test_status, show_percentage
 )
 from service_info import (
-        services_sve, services_entries, services_vuln_templates,
-        services_norm_templates
+        services_sve, services_entries, services_vuln_templates
 )
 
 
@@ -74,65 +73,72 @@ def get_failures(services, configs, versions):
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.
     """
+    total_passed = 0
+
+    # Initialize failure dict to hold failure messages
     failures = {}
-    passed = 0
 
     # Test each service
     for service in services:
-        # Initialize failure dict
+        # Initialize empty failure message list for each service
         failures[service] = []
 
-        # Gather config file, configurations, and templates
-        configurations = services_entries[service]
-        vuln_templates = services_vuln_templates[service]
-        norm_templates = services_norm_templates[service]
-        test_stats = {'passed': 0, 'failed': 0}
+        # Initialize stats dict for percentage output
+        service_test_stats = {'passed': 0, 'failed': 0}
+
+        # Grab templates and srv_file for default entries and regex matching, respectively
+        vuln_templates = services_vuln_templates[service]  # no norm_templates since that's just for prereqs
         with open(configs[service], 'r') as f:
             srv_file = f.read()
 
-        if not configurations:
+        # If a service is listed in services_entries but no actual entries exist, skip it
+        if not services_entries[service]:
             continue
 
         # Show service version
         show_service_info(service, versions[service])
 
         # Test each configuration
-        for name, config in configurations.items():
-            regex = re.compile(config['regex'], flags=re.MULTILINE)
-            config_type = config['type']
-            prereqs = config['prereq']
-            prereq_types = config['prereq_type']
-            found_config = config_exists(regex, config_type, srv_file)
-            uh_oh = False
+        for name, config in services_entries[service].items():
+            flags = re.M|config['regex flags'] if config['regex flags'] else re.M
+            regex = re.compile(config['regex'], flags=flags)
 
             # Found a bad config
-            if found_config:
-                if not prereqs or (prereqs and
-                        check_prereqs(service, prereqs, prereq_types, srv_file)):
-                    if config_type == 'default':
+            if config_exists(regex, config['type'], srv_file):
+                if not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file)):
+                    test_status = 'failed'
+
+                    if config['type'] == 'default':
                         bad_line = color(f"E   missing: {config['regex'][1:]}", "r")
-                        regex = re.compile(vuln_templates[name], flags=re.MULTILINE)
-                    elif config_type == 'special regex':
-                        matches = re.findall(regex,srv_file)
+                        regex = re.compile(vuln_templates[name], flags=flags)
+                    elif config['type'] == 'regex default':
+                        regex = re.compile(vuln_templates[name], flags=flags)
+                        matches = re.findall(regex, srv_file)[0]  # tuple since templates are ()|()
+                        matches = matches[0] if matches[0] else matches[1]
+                        bad_line = color(f"E   missing: {matches}", "r")
+                    elif config['type'] == 'regex explicit':
+                        matches = re.findall(regex, srv_file)
                         bad_line = color(f"E   {', '.join(matches)}", "r")
                     else:
                         bad_line = color(f"E   {config['regex'][1:]}", "r")
+
                     error_line = get_error(service, name,
                         config['description'], regex,
                         configs[service], bad_line)
                     failures[service].append(error_line)
-                    uh_oh = True
+            # Didn't find a bad config
             else:
-                passed += 1
+                test_status = 'passed'
+                total_passed += 1
 
-            # Print test status and increment the aggregate
-            test_status = get_test_status(service, versions[service], uh_oh)
-            test_stats[test_status] += 1
+            # Print test status and increment the current service's aggregate
+            show_test_status(test_status)
+            service_test_stats[test_status] += 1
 
         # Show service test percentage
-        show_percentage(service, versions[service], configurations, test_stats)
+        show_percentage(service, versions[service], services_entries[service], service_test_stats)
 
-    return failures, passed
+    return failures, total_passed
 
 
 def show_failures(services, configs, versions, total_services):
@@ -148,19 +154,21 @@ def show_failures(services, configs, versions, total_services):
     failures, passed = get_failures(services, configs, versions)
     total_time = round(time.time() - start, 3)
 
+    # no tests
     if total_services == 0:
         print(header(f'no tests ran in {total_time} seconds', 'y'))
     else:
         failed = sum([len(fails) for fails in failures.values()])
 
+        # failed some tests
         if any([fails for fails in failures.values()]):
             print(f"\n{header('FAILURES')}")
             for service, fails in failures.items():
                 print(f"{header(f'test_{service}', clr='r', border_type='_')}\n")
                 for error in fails:
                     print(f'{error}\n')
-
             print(header(f'{failed} tests failed, {passed} passed in {total_time} seconds', 'r'))
+        # passed all tests
         else:
             print(header(f'{passed} tests passed in {total_time} seconds', 'g'))
 
