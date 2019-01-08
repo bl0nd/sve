@@ -204,7 +204,7 @@ services_entries = {
             'accept env': {
                 'description': "some environment variables copied into the session's environment can be used to bypass restricted user environments",
                 'type': 'regex explicit',
-                'regex': '^AcceptEnv\s*.*',
+                'regex': '^AcceptEnv\s+.*',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -212,7 +212,7 @@ services_entries = {
             'password auth': {
                 'description': 'password authentication is allowed. Prefer key authentication',
                 'type': 'regex default',
-                'regex': '^PasswordAuthentication\s*no',
+                'regex': '^PasswordAuthentication\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -220,7 +220,7 @@ services_entries = {
             'empty passwords': {
                 'description': 'login to accounts with empty passwords allowed',
                 'type': 'regex explicit',
-                'regex': '^PermitEmptyPasswords\s*yes',
+                'regex': '^PermitEmptyPasswords\s+yes',
                 'regex flags': re.IGNORECASE,
                 'prereq': ['password auth'],
                 'prereq_type': ['vulnerable default'],
@@ -228,7 +228,7 @@ services_entries = {
             'root login': {
                 'description': 'root login allowed',
                 'type': 'regex default',
-                'regex': '^PermitRootLogin\s*no',
+                'regex': '^PermitRootLogin\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': [],
@@ -236,7 +236,7 @@ services_entries = {
             'root login no pass': {
                 'description': 'password authentication disabled for root',
                 'type': 'regex explicit',
-                'regex': '^PermitRootLogin\s*without-password',
+                'regex': '^PermitRootLogin\s+without-password',
                 'regex flags': re.IGNORECASE,
                 'prereq': ['root login'],
                 'prereq_type': ['vulnerable default'],
@@ -244,7 +244,7 @@ services_entries = {
             'permit user env': {
                 'description': 'environment processing may enable users to bypass access restrictions in some configurations using mechanisms like LD_PRELOAD',
                 'type': 'regex explicit',
-                'regex': '^PermitUserEnvironment\s*yes',
+                'regex': '^PermitUserEnvironment\s+yes',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': [],
@@ -252,7 +252,7 @@ services_entries = {
             'protocol 1': {
                 'description': 'using protocol version 1',
                 'type': 'regex explicit',
-                'regex': '^Protocol\s*1',
+                'regex': '^Protocol\s+1',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -260,7 +260,7 @@ services_entries = {
             'pubkey auth': {
                 'description': 'public key authentication disabled',
                 'type': 'regex explicit',
-                'regex': '^PubkeyAuthentication\s*no',
+                'regex': '^PubkeyAuthentication\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': ['protocol 2'],
                 'prereq_type': ['normal default']
@@ -268,7 +268,7 @@ services_entries = {
             'strict mode': {
                 'description': "checking file modes and ownership of users' files or home directory before accepting login disabled. This is desirable since novices sometimes leave their directory/files world-writable.",
                 'type': 'regex explicit',
-                'regex': '^StrictModes\s*no',
+                'regex': '^StrictModes\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -276,7 +276,7 @@ services_entries = {
             'tcp keepalive': {
                 'description': 'sessions may hang indefinitely, leaving "ghost" users and consuming server resources',
                 'type': 'regex explicit',
-                'regex': '^TCPKeepAlive\s*no',
+                'regex': '^TCPKeepAlive\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -284,7 +284,7 @@ services_entries = {
             'use login': {
                 'description': 'login(1) is used for interactive login sessions',
                 'type': 'regex explicit',
-                'regex': '^UseLogin\s*yes',
+                'regex': '^UseLogin\s+yes',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -292,7 +292,7 @@ services_entries = {
             'no privilege separation': {
                 'description': 'privilege separation disabled',
                 'type': 'regex explicit',
-                'regex': '^UsePrivilegeSeparation\s*no',
+                'regex': '^UsePrivilegeSeparation\s+no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
@@ -300,7 +300,7 @@ services_entries = {
             'x11 forwarding': {
                 'description': "the client's X11 display server may be exposed to attack when the SSH client requests forwarding",
                 'type': 'regex explicit',
-                'regex': '^X11Forwarding\s*yes',
+                'regex': '^X11Forwarding\s+yes',
                 'regex flags': re.IGNORECASE,
                 'prereq': ['use login no'],
                 'prereq_type': ['vulnerable explicit']
@@ -315,13 +315,13 @@ services_entries = {
 # TEMPLATES
 services_vuln_templates = {
     'ftp':
-        {'anon enable': '(^anonymous_enable=YES)|(^#+\w*anonymous_enable=.*)',
-         'banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
+        {'anon enable': '(^anonymous_enable=YES)|(^#+\s*anonymous_enable=.*)',
+         'banner': '(^#+\s*ftpd_banner=.*)|(^#+\s*banner_file=.*)'
         },
     'ssh':
-        {'use login no': '(^UseLogin\s*no)|(^#+\w*UseLogin\s*no)',
-         'root login': '(^PermitRootLogin\s*yes)|(^#*\w*PermitRootLogin\s*yes)',
-         'password auth': '(^PasswordAuthentication\s*yes)|(^#*\s*PasswordAuthentication\s*yes)'
+        {'use login no': '(^UseLogin\s+no)|(^#+\s*UseLogin\s+no)',  # disables x11
+         'root login': '(^PermitRootLogin\s+yes)|(^#*\s*PermitRootLogin\s+yes)',
+         'password auth': '(^PasswordAuthentication\s+yes)|(^#*\s*PasswordAuthentication\s+yes)'
         },
     # 'apache':
         # {
@@ -330,10 +330,10 @@ services_vuln_templates = {
 
 services_norm_templates = {
     'ftp':
-        {'local enable': '(^local_enable=YES)|(^#+\w*local_enable=.*)'
+        {'local enable': '(^local_enable=YES)|(^#+\s*local_enable=.*)'
         },
     'ssh':
-        {'protocol 2': '(^protocol\s*(1,)?2(,1)?)|(^#*\s*protocol\s*(1,)?2(,1)?)'
+        {'protocol 2': '(^protocol\s+(1,)?2(,1)?)|(^#+\s*protocol\s+(1,)?2(,1)?)'
         },
     # 'apache':
         # {
