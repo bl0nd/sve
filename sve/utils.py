@@ -179,7 +179,7 @@ def get_versions(distro, services=None):
     """
     versions = {
             'ftp': get_ftp_version(distro),
-            # 'ssh': get_ssh_version(distro, services_configs[distro]['ssh']),
+            'ssh': get_ssh_version(distro, services_configs[distro]['ssh']),
             # 'apache': get_apache_version(distro)
     }
 
@@ -232,7 +232,7 @@ def config_exists(regex, config_type, srv_file):
     :return: Boolean indicating if the config exists.
     :rtype: bool
     """
-    if config_type == 'default':
+    if config_type == 'default' or config_type == 'regex default':
         if not re.findall(regex, srv_file):
             return True
     elif re.findall(regex, srv_file):
@@ -309,21 +309,17 @@ def show_service_info(service, version):
     print(f"{service} ({version})", end=' ')
 
 
-def get_test_status(service, version, uh_oh):
+def show_test_status(test_status):
     """Show test status of the current service.
 
-    :param service: Name of the current service.
-    :param versions: The version of the current service.
-    :param uh_oh: Status of the current test (True or False).
+    :param test_status: Status of the current test (True or False).
     :return: A string indicating whether the test passed or failed.
     :rtype: str
     """
-    if not uh_oh:
+    if test_status == 'passed':
         print(color('.', 'g'), end='')
-        return 'passed'
-    else:
+    elif test_status == 'failed':
         print(color('F', 'r'), end='')
-        return 'failed'
 
 
 def show_collection_count(entries):
