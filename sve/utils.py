@@ -269,7 +269,7 @@ def get_error(service, name, desc, regex, srv_file, bad_line):
     return f"{bad_line}\n{srv_file}:{line_nums} {desc}"
 
 
-def check_prereqs(service, prereqs, prereq_types, srv_file):
+def check_prereqs(service, prereqs, prereq_types, srv_file, flags):
     """Count the number of prerequisites satisfied for a configuration.
 
     :param service: Name of current service.
@@ -279,16 +279,16 @@ def check_prereqs(service, prereqs, prereq_types, srv_file):
     :return: Boolean indicating if prerequisites are met.
     :rtype: bool
     """
+    satisfied = 0
     vuln_templates = services_vuln_templates[service]
     norm_templates = services_norm_templates[service]
 
     if not prereqs:
         return
 
-    satisfied = 0
     for prereq, prereq_type in zip(prereqs, prereq_types):
         templates = vuln_templates if prereq_type.startswith('vulnerable') else norm_templates
-        regex = re.compile(templates[prereq], flags=re.MULTILINE)  # re.MULTILINE is so ^ works
+        regex = re.compile(templates[prereq], flags=flags)
         if re.findall(regex, srv_file):
             satisfied += 1
             break
@@ -366,7 +366,7 @@ def show_percentage(service, version, configurations, test_stats):
 
     :param services: List of existing services or user-specified services.
     :param versions: Dictionary of each service and their version.
-    :param configurations: 
+    :param configurations:
     :param test_stats: Dictionary containing the number of passed and failed tests.
     """
     # 7: ()[]% and the 2 spaces around ()
