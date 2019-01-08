@@ -143,7 +143,7 @@ services_entries = {
                 'prereq_type': []
             },
             'pasv promisc': {
-                'description': 'disabled PASV security check (which ensures data connection originates from the same IP as the control connection)',
+                'description': 'disabled PASV security check (ensures data connection originates from the same IP as the control connection)',
                 'type': 'explicit',
                 'regex': '^pasv_promiscuous=YES',
                 'regex flags': None,
