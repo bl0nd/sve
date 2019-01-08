@@ -14,6 +14,7 @@ When adding another OS, please use the name given in
   with the version number (prefixed with 0 if
   necessary; e.g., 07 for Windows 7).
 """
+import re
 
 # NAMES
 services_sve = ['ftp', 'ssh']
@@ -49,6 +50,7 @@ services_entries = {
                 'description': 'anonymous users may connect using SSL connections',
                 'type': 'explicit',
                 'regex': '^allow_anon_ssl=YES',
+                'regex flags': None,
                 'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
@@ -56,6 +58,7 @@ services_entries = {
                 'description': 'anonymous users may create directories',
                 'type': 'explicit',
                 'regex': '^anon_mkdir_write_enable=YES',
+                'regex flags': None,
                 'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
@@ -63,6 +66,7 @@ services_entries = {
                 'description': 'anonymous users may perform write operations (e.g., deletion, renaming, etc.)',
                 'type': 'explicit',
                 'regex': '^anon_other_write_enable=YES',
+                'regex flags': None,
                 'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
@@ -70,6 +74,7 @@ services_entries = {
                 'description': 'anonymous users may upload files',
                 'type': 'explicit',
                 'regex': '^anon_upload_enable=YES',
+                'regex flags': None,
                 'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
@@ -77,6 +82,7 @@ services_entries = {
                 'description': 'anonymous users may download files other than those that are world readable',
                 'type': 'explicit',
                 'regex': '^anon_world_readable_only=NO',
+                'regex flags': None,
                 'prereq': ['anon enable'],
                 'prereq_type': ['vulnerable default']
             },
@@ -84,6 +90,7 @@ services_entries = {
                 'description': 'anonymous logins permitted',
                 'type': 'default',
                 'regex': '^anonymous_enable=NO',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -91,6 +98,7 @@ services_entries = {
                 'description': 'async ABOR requests enabled',
                 'type': 'explicit',
                 'regex': '^async_abor_enable=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -98,13 +106,15 @@ services_entries = {
                 'description': 'local users are chrooted in their home directory',
                 'type': 'explicit',
                 'regex': '^chroot_local_user=YES',
+                'regex flags': None,
                 'prereq': ['local enable'],
                 'prereq_type': ['normal default']
             },
             'local umask': {
                 'description': 'insufficient umask for local user-created files',
-                'type': 'special regex',
+                'type': 'regex explicit',
                 'regex': '^local_umask=0[0-6][0-6]',
+                'regex flags': None,
                 'prereq': ['local enable'],
                 'prereq_type': ['normal default']
             },
@@ -112,6 +122,7 @@ services_entries = {
                 'description': 'recursive ls enabled (may consume a lot of resources)',
                 'type': 'explicit',
                 'regex': '^ls_recurse_enable=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -119,6 +130,7 @@ services_entries = {
                 'description': 'vsftpd prevented from taking a file lock when writing to a file (this should generally not be enabled)',
                 'type': 'explicit',
                 'regex': '^no_log_lock=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -126,6 +138,7 @@ services_entries = {
                 'description': 'using security model which only uses 1 process per connection',
                 'type': 'explicit',
                 'regex': '^one_process_model=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -133,6 +146,7 @@ services_entries = {
                 'description': 'disabled PASV security check (which ensures data connection originates from the same IP as the control connection)',
                 'type': 'explicit',
                 'regex': '^pasv_promiscuous=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -140,6 +154,7 @@ services_entries = {
                 'description': 'disabled PORT security check (ensures outgoing data connections can only connect to the client)',
                 'type': 'explicit',
                 'regex': '^port_promiscuous=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -147,6 +162,7 @@ services_entries = {
                 'description': 'vsftpd runs as user which launched vsftpd (this should generally not be enabled)',
                 'type': 'explicit',
                 'regex': '^run_as_launching_user=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -154,6 +170,7 @@ services_entries = {
                 'description': 'vsftpd shows session status information in system process listing',
                 'type': 'explicit',
                 'regex': '^setproctitle_enable=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -161,6 +178,7 @@ services_entries = {
                 'description': 'vsftpd can make no guarantees about the security of the OpenSSL libraries',
                 'type': 'explicit',
                 'regex': '^ssl_enable=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -168,6 +186,7 @@ services_entries = {
                 'description': 'virtual users have local user privileges',
                 'type': 'explicit',
                 'regex': '^virtual_use_local_privs=YES',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -175,6 +194,7 @@ services_entries = {
                 'description': 'banner shows version info',
                 'type': 'default',
                 'regex': '(^ftpd_banner=.*)|(^banner_file=.*)',
+                'regex flags': None,
                 'prereq': [],
                 'prereq_type': []
             },
@@ -183,92 +203,105 @@ services_entries = {
         {
             'accept env': {
                 'description': "some environment variables copied into the session's environment can be used to bypass restricted user environments",
-                'type': 'explicit',
-                'regex': '^AcceptEnv\w*.*',
+                'type': 'regex explicit',
+                'regex': '^AcceptEnv\s*.*',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'password auth': {
                 'description': 'password authentication is allowed. Prefer key authentication',
                 'type': 'default',
-                'regex': '^PasswordAuthentication\w*no',
+                'regex': '^PasswordAuthentication\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'empty passwords': {
                 'description': 'login to accounts with empty passwords allowed',
-                'type': 'explicit',
-                'regex': '^PermitEmptyPasswords\w*yes',
+                'type': 'regex explicit',
+                'regex': '^PermitEmptyPasswords\s*yes',
+                'regex flags': re.IGNORECASE,
                 'prereq': ['password auth'],
                 'prereq_type': ['vulnerable default'],
             },
             'root login': {
                 'description': 'root login allowed',
-                'type': 'default',
-                'regex': '^PermitRootLogin\w*no',
+                'type': 'regex default',
+                'regex': '^PermitRootLogin\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': [],
             },
             'root login no pass': {
                 'description': 'password authentication disabled for root',
-                'type': 'explicit',
-                'regex': '^PermitRootLogin\w*without-password',
+                'type': 'regex explicit',
+                'regex': '^PermitRootLogin\s*without-password',
+                'regex flags': re.IGNORECASE,
                 'prereq': ['root login'],
                 'prereq_type': ['vulnerable default'],
             },
             'permit user env': {
                 'description': 'environment processing may enable users to bypass access restrictions in some configurations using mechanisms like LD_PRELOAD',
-                'type': 'explicit',
-                'regex': '^PermitUserEnvironment\w*yes',
+                'type': 'regex explicit',
+                'regex': '^PermitUserEnvironment\s*yes',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': [],
             },
             'protocol 1': {
                 'description': 'using protocol version 1',
-                'type': 'explicit',
-                'regex': '^Protocol\w*1',
+                'type': 'regex explicit',
+                'regex': '^Protocol\s*1',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'pubkey auth': {
                 'description': 'public key authentication disabled',
-                'type': 'explicit',
-                'regex': '^PubkeyAuthentication\w*no',
+                'type': 'regex explicit',
+                'regex': '^PubkeyAuthentication\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': ['protocol 2'],
                 'prereq_type': ['normal default']
             },
             'strict mode': {
                 'description': "checking file modes and ownership of users' files or home directory before accepting login disabled. This is desirable since novices sometimes leave their directory/files world-writable.",
-                'type': 'explicit',
-                'regex': '^StrictModes\w*no',
+                'type': 'regex explicit',
+                'regex': '^StrictModes\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'tcp keepalive': {
                 'description': 'sessions may hang indefinitely, leaving "ghost" users and consuming server resources',
-                'type': 'explicit',
-                'regex': '^TCPKeepAlive\w*no',
+                'type': 'regex explicit',
+                'regex': '^TCPKeepAlive\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'use login': {
                 'description': 'login(1) is used for interactive login sessions',
-                'type': 'explicit',
-                'regex': '^UseLogin\w*yes',
+                'type': 'regex explicit',
+                'regex': '^UseLogin\s*yes',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'no privilege separation': {
                 'description': 'privilege separation disabled',
-                'type': 'explicit',
-                'regex': '^UsePrivilegeSeparation\w*no',
+                'type': 'regex explicit',
+                'regex': '^UsePrivilegeSeparation\s*no',
+                'regex flags': re.IGNORECASE,
                 'prereq': [],
                 'prereq_type': []
             },
             'x11 forwarding': {
                 'description': "the client's X11 display server may be exposed to attack when the SSH client requests forwarding",
-                'type': 'explicit',
-                'regex': '^X11Forwarding\w*yes',
+                'type': 'regex explicit',
+                'regex': '^X11Forwarding\s*yes',
+                'regex flags': re.IGNORECASE,
                 'prereq': ['use login no'],
                 'prereq_type': ['vulnerable explicit']
             },
@@ -286,9 +319,9 @@ services_vuln_templates = {
          'banner': '(^#+\w*ftpd_banner=.*)|(^#+\w*banner_file=.*)'
         },
     'ssh':
-        {'use login no': '(^UseLogin\w*no)|(^#+\w*UseLogin\w*no)',
-         'root login': '(^PermitRootLogin\w*yes)|(^#*\w*PermitRootLogin\w*.*)',
-         'password auth': '(^PasswordAuthentication\w*yes)|(^#*\w*PasswordAuthentication\w*.*)'
+        {'use login no': '(^UseLogin\s*no)|(^#+\w*UseLogin\s*no)',
+         'root login': '(^PermitRootLogin\s*yes)|(^#*\w*PermitRootLogin\s*.*)',
+         'password auth': '(^PasswordAuthentication\s*yes)|(^#*\s*PasswordAuthentication\s*.*)'
         },
     # 'apache':
         # {
@@ -300,7 +333,7 @@ services_norm_templates = {
         {'local enable': '(^local_enable=YES)|(^#+\w*local_enable=.*)'
         },
     'ssh':
-        {'protocol 2': '(^protocol\w*(1,)?2(,1)?)|(^#*\w*protocol\w*(1,)?2(,1)?)'
+        {'protocol 2': '(^protocol\s*(1,)?2(,1)?)|(^#*\s*protocol\s*(1,)?2(,1)?)'
         },
     # 'apache':
         # {
