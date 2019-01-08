@@ -1,7 +1,7 @@
 # sve
 
 
-[![image](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/bl0nd/sve)
+[![image](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/bl0nd/sve)
 [![image](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/bl0nd/sve)
 <!--[![image](https://img.shields.io/badge/contributors.svg)](https://pypi.org/project/sve/)-->
 <!--[![image](https://img.shields.io/badge/vulnerabilities.svg)](https://pypi.org/project/sve/)-->
