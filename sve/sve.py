@@ -105,7 +105,7 @@ def get_failures(services, configs, versions):
 
             # Found a bad config
             if config_exists(regex, config['type'], srv_file):
-                if not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file)):
+                if not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file, flags)):
                     test_status = 'failed'
 
                     if config['type'] == 'default':
