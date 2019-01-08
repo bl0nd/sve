@@ -211,7 +211,7 @@ services_entries = {
             },
             'password auth': {
                 'description': 'password authentication is allowed. Prefer key authentication',
-                'type': 'default',
+                'type': 'regex default',
                 'regex': '^PasswordAuthentication\s*no',
                 'regex flags': re.IGNORECASE,
                 'prereq': [],
@@ -320,8 +320,8 @@ services_vuln_templates = {
         },
     'ssh':
         {'use login no': '(^UseLogin\s*no)|(^#+\w*UseLogin\s*no)',
-         'root login': '(^PermitRootLogin\s*yes)|(^#*\w*PermitRootLogin\s*.*)',
-         'password auth': '(^PasswordAuthentication\s*yes)|(^#*\s*PasswordAuthentication\s*.*)'
+         'root login': '(^PermitRootLogin\s*yes)|(^#*\w*PermitRootLogin\s*yes)',
+         'password auth': '(^PasswordAuthentication\s*yes)|(^#*\s*PasswordAuthentication\s*yes)'
         },
     # 'apache':
         # {
