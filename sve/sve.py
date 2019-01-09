@@ -105,28 +105,33 @@ def get_failures(services, configs, versions):
 
             # Found a bad config
             if config_exists(regex, config['type'], srv_file):
-                if not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file, flags)):
+                # If prereqs check out
+                if (not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file, flags)):
                     test_status = 'failed'
 
-                    # This if/else block is really just for getting the line numbers
+                    # Get default error lines
                     if config['type'] == 'default':
+                        # For defaults, use their templates which'll be:
+                        #   1) The config option in a vulnerable state.
+                        #   2) The config option's name (in the case of
+                        #        implicit defaults).
                         regex = re.compile(vuln_templates[name], flags=flags)
                         match = re.findall(regex, srv_file)
-                        if not match:
-                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
-                            bad_line = color(f"E   implicit: {match}", "r")
-                        else:
+
+                        # If template matches, use the match
+                        if match:
                             match = match[0]
                             bad_line = color(f"E   {match}", "r")
+                        # Otherwise, use the config option name
+                        else:
+                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
+                            bad_line = color(f"E   implicit: {match}", "r")
+                    # Get explicit error lines
                     elif config['type'] == 'explicit':
                         match = re.findall(regex, srv_file)[0]
                         bad_line = color(f"E   {match}", "r")
-                    # else:
-                        # bad_line = color(f"E   {config['regex'][1:]}", "r")
 
-                    error_line = get_error(service, name,
-                        config['description'], regex,
-                        configs[service], bad_line)
+                    error_line = get_error(service, name, config['description'], regex, configs[service], bad_line)
                     failures[service].append(error_line)
             # Didn't find a bad config
             else:
