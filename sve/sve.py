@@ -64,7 +64,7 @@ def get_failures(services, configs, versions):
     """Get service test failure information.
 
     :param services: List of existing services or user-specified services.
-    :param configs: Dictionary of config file locations for each OS. 
+    :param configs: Dictionary of config file locations for each OS.
     :param versions: Dictionary of each service and their version.
     :return failures, passed: A dictionary of each failed entry and its error message,
                                 and the number of passed tests.
@@ -108,19 +108,21 @@ def get_failures(services, configs, versions):
                 if not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file, flags)):
                     test_status = 'failed'
 
-                    if config['type'] == 'default':
-                        bad_line = color(f"E   missing: {config['regex'][1:]}", "r")
+                    # This if/else block is really just for getting the line numbers
+                    if config['type'].endswith('default'):
                         regex = re.compile(vuln_templates[name], flags=flags)
-                    elif config['type'] == 'regex default':
-                        regex = re.compile(vuln_templates[name], flags=flags)
-                        matches = re.findall(regex, srv_file)[0]  # tuple since templates are ()|()
-                        matches = matches[0] if matches[0] else matches[1]
-                        bad_line = color(f"E   missing: {matches}", "r")
-                    elif config['type'] == 'regex explicit':
+                        matches = re.findall(regex, srv_file)
+                        if not matches:
+                            matches = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
+                            bad_line = color(f"E   implicit: {matches}", "r")
+                        else:
+                            matches = matches[0]
+                            bad_line = color(f"E   {matches}", "r")
+                    elif config['type'].endswith('explicit'):
                         matches = re.findall(regex, srv_file)
                         bad_line = color(f"E   {', '.join(matches)}", "r")
-                    else:
-                        bad_line = color(f"E   {config['regex'][1:]}", "r")
+                    # else:
+                        # bad_line = color(f"E   {config['regex'][1:]}", "r")
 
                     error_line = get_error(service, name,
                         config['description'], regex,
@@ -145,7 +147,7 @@ def show_failures(services, configs, versions, total_services):
     """Get failures and display results.
 
     :param services: List of existing services or user-specified services.
-    :param configs: Dictionary of config file locations for each OS. 
+    :param configs: Dictionary of config file locations for each OS.
     :param versions: Dictionary of each service and their version.
     :param total_services: Number of services that sve has tests for.
     :return: None
