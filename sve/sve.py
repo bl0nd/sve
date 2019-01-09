@@ -111,16 +111,16 @@ def get_failures(services, configs, versions):
                     # This if/else block is really just for getting the line numbers
                     if config['type'] == 'default':
                         regex = re.compile(vuln_templates[name], flags=flags)
-                        matches = re.findall(regex, srv_file)
-                        if not matches:
-                            matches = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
-                            bad_line = color(f"E   implicit: {matches}", "r")
+                        match = re.findall(regex, srv_file)
+                        if not match:
+                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
+                            bad_line = color(f"E   implicit: {match}", "r")
                         else:
-                            matches = matches[0]
-                            bad_line = color(f"E   {matches}", "r")
+                            match = match[0]
+                            bad_line = color(f"E   {match}", "r")
                     elif config['type'] == 'explicit':
-                        matches = re.findall(regex, srv_file)
-                        bad_line = color(f"E   {', '.join(matches)}", "r")
+                        match = re.findall(regex, srv_file)[0]
+                        bad_line = color(f"E   {match}", "r")
                     # else:
                         # bad_line = color(f"E   {config['regex'][1:]}", "r")
 
