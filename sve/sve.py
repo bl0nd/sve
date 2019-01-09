@@ -109,7 +109,7 @@ def get_failures(services, configs, versions):
                     test_status = 'failed'
 
                     # This if/else block is really just for getting the line numbers
-                    if config['type'].endswith('default'):
+                    if config['type'] == 'default':
                         regex = re.compile(vuln_templates[name], flags=flags)
                         matches = re.findall(regex, srv_file)
                         if not matches:
@@ -118,7 +118,7 @@ def get_failures(services, configs, versions):
                         else:
                             matches = matches[0]
                             bad_line = color(f"E   {matches}", "r")
-                    elif config['type'].endswith('explicit'):
+                    elif config['type'] == 'explicit':
                         matches = re.findall(regex, srv_file)
                         bad_line = color(f"E   {', '.join(matches)}", "r")
                     # else:
