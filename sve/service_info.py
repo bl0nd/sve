@@ -210,7 +210,7 @@ services_entries = {
                 'prereq_type': []
             },
             'password auth': {
-                'description': 'password authentication is allowed. Prefer key authentication',
+                'description': 'password authentication is allowed; prefer key authentication',
                 'type': 'regex default',
                 'regex': '^PasswordAuthentication\s+no',
                 'regex flags': re.IGNORECASE,
@@ -265,6 +265,14 @@ services_entries = {
                 'prereq': ['protocol 2'],
                 'prereq_type': ['normal default']
             },
+            'client alive interval': {
+                'description': 'no timeout interval specified; idle sessions can be dangerous',
+                'type': 'regex default',
+                'regex': '^ClientAliveInterval\s+[1-9][0-9]*',
+                'regex flags': re.IGNORECASE,
+                'prereq': [],
+                'prereq_type': []
+            },
             'strict mode': {
                 'description': "checking file modes and ownership of users' files or home directory before accepting login disabled. This is desirable since novices sometimes leave their directory/files world-writable.",
                 'type': 'regex explicit',
@@ -313,15 +321,23 @@ services_entries = {
 
 
 # TEMPLATES
+# if we use a template, that means:
+#   1) We're either on a default option (prereq or regular).
+#   2) We already know the vulnerable config option exists.
+# Therefore, all the templates need to do is find either:
+#   1) The vulnerable default explicitly set (e.g., anon_enable)
 services_vuln_templates = {
     'ftp':
-        {'anon enable': '(^anonymous_enable=YES)|(^#+\s*anonymous_enable=.*)',
-         'banner': '(^#+\s*ftpd_banner=.*)|(^#+\s*banner_file=.*)'
+        {'anon enable': '^anonymous_enable=YES',
+         'banner': '^(ftpd_banner|banner_file)',  # since we only get here if ftpd_banner isn't set,
+                                                  # we can just set it to ftpd_banner so it always just
+                                                  # shows the config option name
         },
     'ssh':
-        {'use login no': '(^UseLogin\s+no)|(^#+\s*UseLogin\s+no)',  # disables x11
-         'root login': '(^PermitRootLogin\s+yes)|(^#*\s*PermitRootLogin\s+yes)',
-         'password auth': '(^PasswordAuthentication\s+yes)|(^#*\s*PasswordAuthentication\s+yes)'
+        {'use login no': '^UseLogin\s+no',  # disables x11
+         'root login': '^PermitRootLogin\s+yes',
+         'password auth': '^PasswordAuthentication\s+yes',
+         'client alive interval': '^ClientAliveInterval\s+ 0',
         },
     # 'apache':
         # {
