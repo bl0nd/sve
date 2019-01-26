@@ -112,10 +112,10 @@ Note: To account for implicitly set options, the entire config option should be 
 
 As for using templates to check if prequisite config options are satisfied, the regex depends on its type. valid prerequisite types are shown below:
 
-* vulnerable explicit: The config option must be explicitly set for it to be in a vulnerable state.
-* vulnerable default:  The config option is implicitly set to a vulnerable state.
-* normal explicit:     The config option must be explicitly set for it to be in a safe state.
-* normal default:      The config option is implicitly set to a safe state.
+* **vulnerable explicit**: The config option must be explicitly set for it to be in a vulnerable state.
+* **vulnerable default**:  The config option is implicitly set to a vulnerable state.
+* **normal explicit**:     The config option must be explicitly set for it to be in a safe state.
+* **normal default**:      The config option is implicitly set to a safe state.
 
 But isn't `vulnerable explicit` the same thing as `normal default`? And `vulnerable default` the same as `normal explicit`? Logically, they are. However, the reason for the distinction is that sve's regex processing is very simple. If the regex type has `explicit` in the name, sve will only say the vulnerable config option exists if the regex provided has a match. Likewise, if the regex type has `default` in the name, sve will say the option exists only if there's no match.
 
