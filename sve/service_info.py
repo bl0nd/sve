@@ -321,12 +321,15 @@ services_entries = {
 
 
 # TEMPLATES
-# if we use a template, that means:
-#   1) We're either on a default option (prereq or regular).
-#   2) We already know the vulnerable config option exists.
-# Therefore, all the templates need to do is either:
-#   1) Find the vulnerable default explicitly set.
-#   2) Find the vulnerable config option name.
+"""
+If we're using a template, that means:
+  1) We're on a default option (prereq or regular).
+  2) We know the default option exists in a vulnerable state.
+
+Therefore, all the templates need to do is either:
+  1) Find the entire default option explicitly set.
+  2) Find the default option's name.
+"""
 services_vuln_templates = {
     'ftp':
         {'anon enable': '^anonymous_enable=YES',

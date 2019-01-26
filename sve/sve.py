@@ -40,7 +40,7 @@ def create_parser():
 
     parser.add_argument('--version', action='store_true',
                         help='Show program version and exit')
-    parser.add_argument('--services',
+    parser.add_argument('-s', '--services',
                         help='Specifies services to enumerate')
 
     return parser.parse_args()
