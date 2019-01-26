@@ -73,6 +73,13 @@ def get_failures(services, configs, versions):
                                     passed tests.
     :rtype: dict, int
 
+    For defaults, we use their templates since if a default entry is matched,
+      that means we couldn't find the option in a safe state. So to create
+      the error line for a default entry, we must match either:
+
+          1) The entire config option in a vulnerable state.
+          2) The config option's name (in the case of implicit defaults).
+
     TODO:
         1. Multiple regex flags.
 
@@ -113,10 +120,6 @@ def get_failures(services, configs, versions):
                     test_status = 'failed'
 
                     if config['type'] == 'default':
-                        # For defaults, use templates which'll give us either:
-                        #   1) The config option in a vulnerable state.
-                        #   2) The config option's name (in the case of
-                        #        implicit defaults).
                         regex = re.compile(vuln_templates[name], flags=flags)
                         match = re.findall(regex, srv_file)
 
@@ -147,7 +150,10 @@ def get_failures(services, configs, versions):
             show_test_status(test_status)
             service_test_stats[test_status] += 1
 
-        show_percentage(service, versions[service], services_entries[service], service_test_stats)
+        show_percentage(service,
+                        versions[service],
+                        services_entries[service],
+                        service_test_stats)
 
     return failure_msgs, tests_passed
 
