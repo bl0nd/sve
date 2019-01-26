@@ -38,8 +38,10 @@ def create_parser():
     parser = argparse.ArgumentParser()
 
 
-    parser.add_argument('--version', action='store_true', help='Show program version and exit')
-    parser.add_argument('--services', help='Specifies services to enumerate')
+    parser.add_argument('--version', action='store_true',
+                        help='Show program version and exit')
+    parser.add_argument('--services',
+                        help='Specifies services to enumerate')
 
     return parser.parse_args()
 
