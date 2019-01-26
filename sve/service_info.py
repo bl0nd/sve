@@ -108,7 +108,7 @@ services_entries = {
                 'regex': '^chroot_local_user=YES',
                 'regex flags': None,
                 'prereq': ['local enable'],
-                'prereq_type': ['normal default']
+                'prereq_type': ['vulnerable explicit']
             },
             'local umask': {
                 'description': 'insufficient umask for local user-created files',
@@ -116,7 +116,7 @@ services_entries = {
                 'regex': '^local_umask=0[0-6][0-6]',
                 'regex flags': None,
                 'prereq': ['local enable'],
-                'prereq_type': ['normal default']
+                'prereq_type': ['vulnerable explicit']
             },
             'ls recursive': {
                 'description': 'recursive ls enabled (may consume a lot of resources)',
@@ -322,26 +322,62 @@ services_entries = {
 
 # TEMPLATES
 """
-If we're using a template, that means:
-  1) We're on a default option (prereq or regular).
-  2) We know the default option exists in a vulnerable state.
+Templates are used for 2 things:
 
-Therefore, all the templates need to do is either:
-  1) Find the entire default option explicitly set.
-  2) Find the default option's name.
+  1) Prerequisite checking for all entries.
+  2) Getting error line and line numbers for default entries.
+
+If we're doing error line or line numbers, the regex used should
+  be the config option in a vulnerable state. To account for
+  implicitness, the name of the config option should at least
+  be in the regex so we can provide the name in the error line.
+
+If we're doing prerequisite checking, the regex used depends on
+  the prereq state and type:
+
+  vulnerable explicit: The config option must be explicitly set for
+                         it to be in a vulnerable state.
+  vulnerable default:  The config option is implicitly set to a
+                         vulnerable state.
+  normal explicit:     The config option must be explicitly set for
+                         it to be in a safe state.
+  normal default:      The config option is implicitly set to a
+                         safe state.
 """
 services_vuln_templates = {
     'ftp':
-        {'anon enable': '^anonymous_enable=YES',
+        {'anon enable': {
+            'vuln': '^anonymous_enable=YES',
+            'safe': '^anonymous_enable=NO'
+            },
+         # not a prereq
          'banner': '^(ftpd_banner|banner_file)',  # since we only get here if ftpd_banner isn't set,
                                                   # we can just set it to ftpd_banner so it always just
                                                   # shows the config option name
+         #  This is here b/c if it were an ND, local_umask would
+         #    only show if local_enable=YES wasn't in the file.
+         #    And it couldn't be a NE since that would look for
+         #    local_enable=NO as prereq confirmation.
+         'local enable': {
+            'vuln': '^local_enable=YES',
+            'safe': '^local_enable=NO'
+            },
         },
     'ssh':
-        {'use login no': '^UseLogin\s+no',  # disables x11
-         'root login': '^PermitRootLogin\s+yes',
-         'password auth': '^PasswordAuthentication\s+yes',
-         'client alive interval': '^ClientAliveInterval\s+ 0',
+        {'use login no': {
+            'vuln': '^UseLogin\s+yes',  # disables x11
+            'safe': '^UseLogin\s+no',
+            },
+         'root login': {
+             'vuln': '^PermitRootLogin\s+yes',
+             'safe': '^PermitRootLogin\s+no'
+             },
+         'password auth': {
+             'vuln': '^PasswordAuthentication\s+yes',
+             'safe': '^PasswordAuthentication\s+no'
+             },
+         # not a prereq
+         'client alive interval': '^ClientAliveInterval\s+0',
         },
     # 'apache':
         # {
@@ -350,10 +386,19 @@ services_vuln_templates = {
 
 services_norm_templates = {
     'ftp':
-        {'local enable': '(^local_enable=YES)|(^#+\s*local_enable=.*)'
+        {
         },
     'ssh':
-        {'protocol 2': '(^protocol\s+(1,)?2(,1)?)|(^#+\s*protocol\s+(1,)?2(,1)?)'
+        # This is here and not local_enable because if it were a VE,
+        #   and Protocol 1 was set, then PubkeyAuthentication would
+        #   show up. Since it's a ND, PubkeyAuthentication will only
+        #   show up if there's no match for Protocol 1. We can't have
+        #   it as a VD either cause that wouldn't make any sense as
+        #   the key values would be flipped flopped.
+        {'protocol 2': {
+             'vuln': '^protocol\s+1',
+             'safe': '^protocol\s+(1,)?2(1,)?'
+             },
         },
     # 'apache':
         # {

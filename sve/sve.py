@@ -110,17 +110,17 @@ def get_failures(services, configs, versions):
             flags = re.M | config['regex flags'] if config['regex flags'] else re.M
             regex = re.compile(config['regex'], flags=flags)
 
-            if config_exists(regex, config['type'], srv_file):
-                if (not config['prereq'] or
-                        (config['prereq'] and check_prereqs(service,
-                                                            config['prereq'],
-                                                            config['prereq_type'],
-                                                            srv_file,
-                                                            flags))):
+            if (config_exists(regex, config['type'], srv_file) and
+                (not config['prereq'] or
+                (config['prereq'] and check_prereqs(service,
+                                                    config['prereq'],
+                                                    config['prereq_type'],
+                                                    srv_file,
+                                                    flags)))):
                     test_status = 'failed'
 
                     if config['type'] == 'default':
-                        regex = re.compile(vuln_templates[name], flags=flags)
+                        regex = re.compile(vuln_templates[name]['vuln'], flags=flags)
                         match = re.findall(regex, srv_file)
 
                         # If template matches, use the match
@@ -129,7 +129,7 @@ def get_failures(services, configs, versions):
                             bad_line = color(f"E   {match}", "r")
                         # Otherwise, use the config option name
                         else:
-                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
+                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name]['vuln'])[0]
                             bad_line = color(f"E   implicit: {match}", "r")
                     elif config['type'] == 'explicit':
                         match = re.findall(regex, srv_file)[0]

@@ -287,11 +287,15 @@ def check_prereqs(service, prereqs, prereq_types, srv_file, flags):
         return
 
     for prereq, prereq_type in zip(prereqs, prereq_types):
-        templates = vuln_templates if prereq_type.startswith('vulnerable') else norm_templates
-        regex = re.compile(templates[prereq], flags=flags)
-        if re.findall(regex, srv_file):
+        state, re_type = prereq_type.split()
+        templates = vuln_templates if state == 'vulnerable' else norm_templates
+        if prereq_type == 'vulnerable explicit' or prereq_type == 'normal default':
+            regex = re.compile(templates[prereq]['vuln'], flags=flags)
+        elif prereq_type == 'vulnerable default' or prereq_type == 'normal explicit':
+            regex = re.compile(templates[prereq]['safe'], flags=flags)
+
+        if config_exists(regex, re_type, srv_file):
             satisfied += 1
-            break
 
     if satisfied != len(prereqs):
         return False
