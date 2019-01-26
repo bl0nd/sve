@@ -66,22 +66,20 @@ def get_failures(services, configs, versions):
     :param services: List of existing services or user-specified services.
     :param configs: Dictionary of config file locations for each OS.
     :param versions: Dictionary of each service and their version.
-    :return failures, passed: A dictionary of each failed entry and its error message,
-                                and the number of passed tests.
+    :return failure_msgs, passed: A dictionary of each failed entry and its error message,
+                                    and the number of passed tests.
     :rtype: dict, int
 
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.
     """
-    total_passed = 0
-
-    # Initialize failure dict to hold failure messages
-    failures = {}
+    failure_msgs = {}
+    tests_passed = 0
 
     # Test each service
     for service in services:
         # Initialize empty failure message list for each service
-        failures[service] = []
+        failure_msgs[service] = []
 
         # Initialize stats dict for percentage output
         service_test_stats = {'passed': 0, 'failed': 0}
@@ -132,11 +130,11 @@ def get_failures(services, configs, versions):
                         bad_line = color(f"E   {match}", "r")
 
                     error_line = get_error(service, name, config['description'], regex, configs[service], bad_line)
-                    failures[service].append(error_line)
+                    failure_msgs[service].append(error_line)
             # Didn't find a bad config
             else:
                 test_status = 'passed'
-                total_passed += 1
+                tests_passed += 1
 
             # Print test status and increment the current service's aggregate
             show_test_status(test_status)
@@ -145,7 +143,7 @@ def get_failures(services, configs, versions):
         # Show service test percentage
         show_percentage(service, versions[service], services_entries[service], service_test_stats)
 
-    return failures, total_passed
+    return failure_msgs, tests_passed
 
 
 def show_failures(services, configs, versions, total_services):
@@ -158,19 +156,19 @@ def show_failures(services, configs, versions, total_services):
     :return: None
     """
     start = time.time()
-    failures, passed = get_failures(services, configs, versions)
+    failure_msgs, passed = get_failures(services, configs, versions)
     total_time = round(time.time() - start, 3)
 
     # no tests
     if total_services == 0:
         print(header(f'no tests ran in {total_time} seconds', 'y'))
     else:
-        failed = sum([len(fails) for fails in failures.values()])
+        failed = sum([len(fails) for fails in failure_msgs.values()])
 
         # failed some tests
-        if any([fails for fails in failures.values()]):
+        if any([fails for fails in failure_msgs.values()]):
             print(f"\n{header('FAILURES')}")
-            for service, fails in failures.items():
+            for service, fails in failure_msgs.items():
                 print(f"{header(f'test_{service}', clr='r', border_type='_')}\n")
                 for error in fails:
                     print(f'{error}\n')
