@@ -66,9 +66,13 @@ def get_failures(services, configs, versions):
     :param services: List of existing services or user-specified services.
     :param configs: Dictionary of config file locations for each OS.
     :param versions: Dictionary of each service and their version.
-    :return failure_msgs, passed: A dictionary of each failed entry and its error message,
-                                    and the number of passed tests.
+    :return failure_msgs, passed: A dictionary of each failed entry and
+                                    its error message, and the number of
+                                    passed tests.
     :rtype: dict, int
+
+    TODO:
+        1. Multiple regex flags.
 
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.
@@ -76,40 +80,38 @@ def get_failures(services, configs, versions):
     failure_msgs = {}
     tests_passed = 0
 
-    # Test each service
     for service in services:
-        # Initialize empty failure message list for each service
-        failure_msgs[service] = []
+        failure_msgs[service] = []  # empty failure message list for `service`
+        service_test_stats = {'passed': 0, 'failed': 0}  # for percentage output
 
-        # Initialize stats dict for percentage output
-        service_test_stats = {'passed': 0, 'failed': 0}
-
-        # Grab templates and srv_file for default entries and regex matching, respectively
-        vuln_templates = services_vuln_templates[service]  # no norm_templates since that's just for prereqs
+        # Grab vulnerable templates and service file contents
+        #   for default entries and regex matching
+        vuln_templates = services_vuln_templates[service]
         with open(configs[service], 'r') as f:
             srv_file = f.read()
 
-        # If a service is listed in services_entries but no actual entries exist, skip it
+        # Skip if no actual entries exist for a listed service
         if not services_entries[service]:
             continue
 
-        # Show service version
         show_service_info(service, versions[service])
 
         # Test each configuration
         for name, config in services_entries[service].items():
-            flags = re.M|config['regex flags'] if config['regex flags'] else re.M
+            flags = re.M | config['regex flags'] if config['regex flags'] else re.M
             regex = re.compile(config['regex'], flags=flags)
 
-            # Found a bad config
             if config_exists(regex, config['type'], srv_file):
-                # If prereqs check out
-                if (not config['prereq'] or (config['prereq'] and check_prereqs(service, config['prereq'], config['prereq_type'], srv_file, flags))):
+                if (not config['prereq'] or
+                        (config['prereq'] and check_prereqs(service,
+                                                            config['prereq'],
+                                                            config['prereq_type'],
+                                                            srv_file,
+                                                            flags))):
                     test_status = 'failed'
 
-                    # Get default error lines
                     if config['type'] == 'default':
-                        # For defaults, use their templates which'll be:
+                        # For defaults, use templates which'll give us either:
                         #   1) The config option in a vulnerable state.
                         #   2) The config option's name (in the case of
                         #        implicit defaults).
@@ -124,23 +126,25 @@ def get_failures(services, configs, versions):
                         else:
                             match = re.findall(r'[a-zA-Z_]+', vuln_templates[name])[0]
                             bad_line = color(f"E   implicit: {match}", "r")
-                    # Get explicit error lines
                     elif config['type'] == 'explicit':
                         match = re.findall(regex, srv_file)[0]
                         bad_line = color(f"E   {match}", "r")
 
-                    error_line = get_error(service, name, config['description'], regex, configs[service], bad_line)
+                    error_line = get_error(service,
+                                           name,
+                                           config['description'],
+                                           regex,
+                                           configs[service],
+                                           bad_line)
                     failure_msgs[service].append(error_line)
-            # Didn't find a bad config
             else:
                 test_status = 'passed'
                 tests_passed += 1
 
-            # Print test status and increment the current service's aggregate
+            # Print test status and increment the current service's test status
             show_test_status(test_status)
             service_test_stats[test_status] += 1
 
-        # Show service test percentage
         show_percentage(service, versions[service], services_entries[service], service_test_stats)
 
     return failure_msgs, tests_passed
