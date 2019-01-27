@@ -1,1 +1,2 @@
-include README.md LICENSE requirements.txt Pipfile Pipfile.lock
+include README.md LICENSE requirements.txt CONTRIBUTING.md
+recursive-include contributing-guides
