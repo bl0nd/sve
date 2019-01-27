@@ -7,8 +7,6 @@
 
 Sve is a community-driven enumeration tool for vulnerable service configurations.
 
-<!--<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50747864-d769a800-11fb-11e9-9220-ba7e9c83482c.png"></p>-->
-<!--<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/51778515-ba701880-20c7-11e9-849c-8494a4fb5a62.png"></p>-->
 <p align="center"> <img src="https://user-images.githubusercontent.com/25558240/51778758-1f783e00-20c9-11e9-9b30-277c56e97175.png"></p>
 
 
