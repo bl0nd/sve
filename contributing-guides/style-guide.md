@@ -20,7 +20,7 @@ When adding a new service or operating system:
 1. Append the service's common name to `services_sve`.
 2. Update each operating system's service dictionary in `services_actual`. As a quick reference, the format of a `services_actual` entry is:
 
-```
+```python
 'Operating System or Linux distribution':
     {
         'common service name 1': 'actual service name 1',
@@ -36,7 +36,7 @@ When adding a new service or operating system:
 This section holds the configuration file locations of the services processed by `sve`. The locations may differ between operating systems so each OS has it's own dictionary that needs to be updated when adding a new service.
 
 The format of `services_configs` is:
-```
+```python
 'Operating System or Linux distribution':
     {
         'common service name 1': 'config file 1',
@@ -50,7 +50,7 @@ The format of `services_configs` is:
 ### Entries
 This section holds information about configuration options processed by sve. The format of `services_entries` is:
 
-```
+```python
 'common service name':
     {
         'short entry name (preferably 2 or 3 words)': {
@@ -124,7 +124,7 @@ There are 2 template structures:
 * `services_norm_templates` holds patterns for config options that must be in a safe state to satisfy any prerequisite requirements.
 
 Both of their formats are:
-```
+```python
 'common service name':
     {'short entry name (non-prereq)': 'regex pattern',
      'short entry name (prereq)': {
@@ -137,7 +137,7 @@ Both of their formats are:
 ```
 
 As a general rule, the regex patterns tend to follow the following formats:
-```
+```python
 ^{ENTRY NAME}={ENTRY VALUE}
 ^{ENTRY NAME}\s+{ENTRY VALUE}
 
