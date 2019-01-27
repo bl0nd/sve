@@ -55,9 +55,9 @@ This section holds information about configuration options processed by sve. The
     {
         'short entry name (preferably 2 or 3 words)': {
             'description': 'brief description of the vulnerability',
-            'type': 'the entry's type',
+            'type': 'entry type',
             'regex': 'a regex pattern for determining if the config option is set',
-            'regex flags': regex related flags
+            'regex flags': re.flags
             'prereq': ['list', 'of', 'prerequisite', 'config', 'options']
             'prereq_type': ['list', 'of', 'types', 'for', 'each', 'prerequisite']
         },
@@ -137,7 +137,7 @@ Both of their formats are:
 ```
 
 As a general rule, the regex patterns tend to follow the following formats:
-```python
+```
 ^{ENTRY NAME}={ENTRY VALUE}
 ^{ENTRY NAME}\s+{ENTRY VALUE}
 
