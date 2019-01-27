@@ -4,7 +4,7 @@
 sve.sve
 ~~~~~~~
 
-This module does something.
+Main module.
 """
 
 import re
@@ -12,14 +12,14 @@ import sys
 import time
 import argparse
 
-from __version__ import __version__
-from output import color, header
-from utils import (
+from . import __version__
+from .output import color, header
+from .utils import (
         get_os, get_existing, get_active, get_configs, get_versions,
         show_collection_count, show_service_info, config_exists, check_prereqs,
         get_error, show_test_status, show_percentage
 )
-from service_info import (
+from .service_info import (
         services_sve, services_entries, services_vuln_templates
 )
 
