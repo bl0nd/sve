@@ -57,8 +57,9 @@ This section holds information about configuration options processed by sve. The
             'description': 'brief description of the vulnerability',
             'type': 'the entry's type',
             'regex': 'a regex pattern for determining if the config option is set',
-            'prereq': 'a list of prerequisite config options',
-            'prereq_type': 'a list of types for each prerequisite'
+            'regex flags': regex related flags
+            'prereq': ['list', 'of', 'prerequisite', 'config', 'options']
+            'prereq_type': ['list', 'of', 'types', 'for', 'each', 'prerequisite']
         },
         ...
     }
@@ -74,8 +75,8 @@ For example, `anonymous_enable` can only be set to `YES` (vulnerable) or `NO` (s
   * For example, `anon_upload_enable` must be explicitly set to `YES`.
 * **default**: Indicates that the config option is in a vulnerable state by default.
   * For example, `anonymous_enable` is automatically set to `YES`.
-* **special regex**: Indicates the config option type is explicit, but matching it relies on some regex magic and thus requires some special output processing on sve's side.
-  * For example, `^local_umask=0[0-6][0-6]` is a special regex since in our test output we don't want to show `[0-6]` but the actual number matched.
+<!--* **special regex**: Indicates the config option type is explicit, but matching it relies on some regex magic and thus requires some special output processing on sve's side.-->
+  <!--* For example, `^local_umask=0[0-6][0-6]` is a special regex since in our test output we don't want to show `[0-6]` but the actual number matched.-->
 
 
 #### `regex`
@@ -87,41 +88,40 @@ The `regex` field is a pattern allowing sve to determine if a vulnerable config 
 
 * If an entry is considered a `special regex`, follow the rules for `explicit` regexes.
 
+#### `regex flags`
+The `regex flags` field is a |-delimited list of flags for regex pre-processing. For example, SSH config options are case-insensitive so the flag `re.IGNORECASE` would be an appropriate value. For a list of valid regex flags, see the [re module's documentation](https://docs.python.org/3/library/re.html#re.A).
 
+<a name="prereq"></a>
 #### `prereq`, `prereq_type`
 The `prereq` field is a list of config options required by an entry, denoted by their short entry name. For example, `allow_anon_ssl` requires `anonymous_enable` and so you would put `anon FTP` in `prereq`.
 
 Prerequisites also have their own types, reflected in the `prereq_type` field. Its value is a list of corresponding types for each prerequisite listed in `prereq`. Valid prerequisite types include:
-* **normal explicit**: The prerequisite is a safe config option that must be explicitly set.
-  * For example, `local_umask` is a potentially vulnerable config option that requires `local_enable`, a safe config option, to be set).
-* **normal default**: The prerequisite is a safe config option that is automatically set.
-* **vulnerable explicit**: The prerequisite is a vulnerable config option that must be explicitly set.
-* **vulnerable default**: The prerequisite is a vulnerable config option that is automatically set.
-  * For example, `anon_upload_enable` is a potentially vulnerable config option that requires `anonymous_enable`, a vulnerable config option that's automatically set to `YES`.
-
-<a name="templates"></a>
-### Templates
-This section contains templates for default entries. Templates have 3 main uses:
-1. Getting the line number of explicitly set default vulnerable config options.
-2. Getting the config option name of implicitly set default vulnerable config options.
-3. Prerequisite checking for all config options.
-
-Use cases 1 and 2 can be thought of as the same thing when submitting a new entry. The regex for either situation should match the config option in a vulnerable state.
-
-Note: To account for implicitly set options, the entire config option should be in the regex so that we can provide the name in the error line. For example, `^anonymous_enable=YES` is fine since we would be able to match `anonymous_enable` if the option's not explicitly set.
-
-As for using templates to check if prequisite config options are satisfied, the regex depends on its type. valid prerequisite types are shown below:
 
 * **vulnerable explicit**: The config option must be explicitly set for it to be in a vulnerable state.
 * **vulnerable default**:  The config option is implicitly set to a vulnerable state.
 * **normal explicit**:     The config option must be explicitly set for it to be in a safe state.
 * **normal default**:      The config option is implicitly set to a safe state.
 
-But isn't `vulnerable explicit` the same thing as `normal default`? And `vulnerable default` the same as `normal explicit`? Logically, they are. However, the reason for the distinction is that sve's regex processing is very simple. If the regex type has `explicit` in the name, sve will only say the vulnerable config option exists if the regex provided has a match. However, if the regex type has `default` in the name, sve will say the option exists only if there's no match.
+But wait, isn't `vulnerable explicit` the same thing as `normal default`? And `vulnerable default` the same as `normal explicit`? Logically, they are. However, the reason for the distinction is that sve's regex processing is simple. If the regex type has `explicit` in the name, sve will say the vulnerable config option exists only if the regex provided has a match. However, if the regex type has `default` in the name, sve will say the option exists only if there's no match.
 
 Given that, consider the `PubkeyAuthentication` option for SSH. It requires the `Protocol` option to be set to `2` (since only SSHv2 supports public key authentication), which it automatically is in most SSH clients. In our heads, it would make sense to label `Protocol` as a `vulnerable explicit` since you have to explicitly set it to `1` for it to be in a vulnerable state right? Well, if you set and provide `Protocol 1` as the prerequisite regex to sve with a type of `vulnerable explicit`, sve would say that `PubkeyAuthentication`'s prerequisites are satisfied, which we know isn't to be true as `PubkeyAuthentication` requires `Protocol 2`. We also can't just switch the regex provided as that would mean the `vuln` key would have a value of the config option in a safe state and the `safe` key would have a value of the config option in a vulnerable state, which is even more confusing. So that's why we have 4 prereq types.
 
-There are 2 template structures, `services_vuln_templates` which holds patterns for vulnerable config options, and `services_norm_templates` which holds patterns for safe config options (**that actually doesn't hold true anymore this needs a better name**).
+<a name="templates"></a>
+### Templates
+Templates have 3 main uses:
+1. Getting the line number of explicitly set default vulnerable config options.
+2. Getting the config option name of implicitly set default vulnerable config options.
+3. Prerequisite checking for all config options.
+
+Use cases 1 and 2 can be thought of as the same thing when submitting a new entry. The regex for either situation should match the config option in a vulnerable state.
+
+*Note*: To account for implicitly set options, the entire config option should be in the regex so that we can provide the name in the error line. For example, `^anonymous_enable=YES` is appropriate since we would be able to match `anonymous_enable` if the option is implicitly set.
+
+As for using templates for prerequisite checking, the regex depends on its type (set in `prereq_type`.
+
+There are 2 template structures:
+* `services_vuln_templates` holds patterns for config options that must be in a vulnerable state to satisfy any prerequisite requirements.
+* `services_norm_templates` holds patterns for config options that must be in a safe state to satisfy any prerequisite requirements.
 
 Both of their formats are:
 ```
@@ -145,3 +145,5 @@ As a general rule, the regex patterns tend to follow the following formats:
 ^anonymous_enable=YES
 ^PasswordAuthentication\s+yes
 ```
+
+*Note*: Please refer to the [`prereq_type` section](#prereq) when creating your regex patterns for prerequisite templates. Adhering to the type guidelines there will make the process smoother for both you and sve.
