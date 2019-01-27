@@ -106,7 +106,7 @@ But wait, isn't `vulnerable explicit` the same thing as `normal default`? And `v
 
 Given that, consider the `PubkeyAuthentication` option for SSH. It requires the `Protocol` option to be set to `2` (since only SSHv2 supports public key authentication). Since SSh automatically uses protocol 2, it would make sense to label `Protocol` as a `vulnerable explicit` since you have to explicitly set it to `1` for it to be in a vulnerable state right?
 
-Well, if you set and provide `Protocol 1` as the prerequisite regex to sve with a type of `vulnerable explicit`, sve would say that `PubkeyAuthentication`'s prerequisites are satisfied, which we know isn't to be true as `PubkeyAuthentication` requires `Protocol 2`. We also can't just switch the regex provided as that would mean the `vuln` key would have a value of the config option in a safe state and the `safe` key would have a value of the config option in a vulnerable state, which is even more confusing. So that's why we have 4 prereq types.
+Well, if you set and provide `Protocol 1` as the prerequisite regex to sve with a type of `vulnerable explicit`, sve would say that the prerequisites for `PubkeyAuthentication` are satisfied, which we know isn't to be true since the option requires `Protocol 2`. We also can't just switch the regex provided as that would mean the `vuln` key would have a value of the config option in a safe state and the `safe` key would have a value of the config option in a vulnerable state, which is even more confusing. So having these 4 specific prerequisite types helps us cover all possible cases.
 
 <a name="templates"></a>
 ### Templates
