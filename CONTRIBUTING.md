@@ -1,6 +1,6 @@
 # Contributing
 
-All sve entries are stored right here on Github in [*service_info.py*](https://github.com/bl0nd/sve/blob/master/sve/service_info.py). Just open an issue or send a pull request and we'll add it in as soon as possible!
+All sve entries are stored in [*service_info.py*](https://github.com/bl0nd/sve/blob/master/sve/service_info.py). Just open an issue or send a pull request and we'll add it in as soon as possible!
 
 
 ## Style
