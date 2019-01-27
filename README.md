@@ -8,8 +8,6 @@
 
 Sve is a community-driven enumeration tool for vulnerable service configurations.
 
-Whether you're new to system hardening or a veteran system administrator, sve is here to make sure you don't have configurations that probably shouldn't be set on your blue team box or company servers.
-
 <!--<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/50747864-d769a800-11fb-11e9-9220-ba7e9c83482c.png"></p>-->
 <!--<p align="center"> <img src="https://user-images.githubusercontent.com/25558240/51778515-ba701880-20c7-11e9-849c-8494a4fb5a62.png"></p>-->
 <p align="center"> <img src="https://user-images.githubusercontent.com/25558240/51778758-1f783e00-20c9-11e9-9b30-277c56e97175.png"></p>
@@ -17,10 +15,10 @@ Whether you're new to system hardening or a veteran system administrator, sve is
 
 ## Services
 Currently, covered services include:
-* `FTP`
+* `VSFTP`
 * `SSH`
 
 
 ## Contributing
-Found a vulnerable configuration that isn't covered? Contributions are very welcome! Take a look at the [contributing guidelines](https://github.com/bl0nd/sve/blob/master/CONTRIBUTING.md) and have at it! 
+Found a vulnerable configuration that isn't covered? Contributions are very welcome! Take a look at the [contributing guidelines](https://github.com/bl0nd/sve/blob/master/CONTRIBUTING.md) to get started! 
  
