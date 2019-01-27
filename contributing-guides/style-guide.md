@@ -146,4 +146,4 @@ As a general rule, the regex patterns tend to follow the following formats:
 ^PasswordAuthentication\s+yes
 ```
 
-*Note*: Please refer to the [`prereq_type` section](#prereq) when creating your regex patterns for prerequisite templates. Adhering to the type guidelines there will make the process smoother for both you and sve.
+*Note*: Please refer to the [prerequisite section](#prereq) when creating your regex patterns for prerequisite templates. Adhering to the type guidelines there will make the process smoother for both you and sve.
