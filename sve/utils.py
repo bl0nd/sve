@@ -21,6 +21,7 @@ from .entries import (
 
 TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
 
+# SERVICE UTILITIES
 def get_os():
     """Get name of OS/distribution.
 
@@ -223,6 +224,17 @@ def parse_services(services):
     return services
 
 
+def show_service_info(service, version):
+    """Show current service and its version.
+
+    :param service: Name of the current service.
+    :param versions: The version of the current service.
+    :return: None
+    """
+    print(f"{service} ({version})", end=' ')
+
+
+# ENTRY UTILITIES
 def config_exists(regex, config_type, srv_file):
     """Determine if a config exists.
 
@@ -303,16 +315,7 @@ def check_prereqs(service, prereqs, prereq_types, srv_file, flags):
     return True
 
 
-def show_service_info(service, version):
-    """Show current service and its version.
-
-    :param service: Name of the current service.
-    :param versions: The version of the current service.
-    :return: None
-    """
-    print(f"{service} ({version})", end=' ')
-
-
+# TEST UTILITIES
 def show_test_status(test_status):
     """Show test status of the current service.
 
@@ -377,3 +380,4 @@ def show_percentage(service, version, configurations, test_stats):
     percentage = get_test_stats(test_stats['passed'], test_stats['failed'])
     spacing = ' ' * (TERM_WIDTH - (len(service) + len(version) + 7 + len(configurations) + len(percentage)))
     print(color(f'{spacing}[{percentage}%]', 'b'))
+
