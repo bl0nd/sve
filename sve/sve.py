@@ -13,8 +13,8 @@ import time
 import argparse
 
 from . import __version__
-from .output import color, header
 from .utils import (
+        color, header,
         get_os, get_existing, get_active, get_configs, get_versions,
         show_collection_count, show_service_info, config_exists, check_prereqs,
         get_error, show_test_status, show_percentage, parse_services
