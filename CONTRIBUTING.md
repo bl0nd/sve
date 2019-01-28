@@ -13,7 +13,7 @@ Most people submit pull requests to the sve project using GitHub's web interface
 If you prefer, you can do most of the process using the command line instead.
 The overall process should look somewhat like this:
 
-1. Fork the tldr repository on the github web interface.
+1. Fork the sve repository on the github web interface.
 
 2. Clone your fork locally:  
   `git clone https://github.com/<your_username>/sve.git && cd sve`
