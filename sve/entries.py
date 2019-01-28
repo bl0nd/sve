@@ -1,5 +1,5 @@
 """
-sve.service_info
+sve.entries
 ~~~~~~~~~~~~
 
 This module contains service information.
