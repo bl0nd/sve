@@ -19,7 +19,7 @@ from .utils import (
         show_collection_count, show_service_info, config_exists, check_prereqs,
         get_error, show_test_status, show_percentage
 )
-from .service_info import (
+from .entries import (
         services_sve, services_entries, services_vuln_templates
 )
 
@@ -171,13 +171,11 @@ def show_failures(services, configs, versions, total_services):
     failure_msgs, passed = get_failures(services, configs, versions)
     total_time = round(time.time() - start, 3)
 
-    # no tests
     if total_services == 0:
         print(header(f'no tests ran in {total_time} seconds', 'y'))
     else:
         failed = sum([len(fails) for fails in failure_msgs.values()])
 
-        # failed some tests
         if any([fails for fails in failure_msgs.values()]):
             print(f"\n{header('FAILURES')}")
             for service, fails in failure_msgs.items():
@@ -186,7 +184,6 @@ def show_failures(services, configs, versions, total_services):
                     for error in fails:
                         print(f'{error}\n')
             print(header(f'{failed} tests failed, {passed} passed in {total_time} seconds', 'r'))
-        # passed all tests
         else:
             print(header(f'{passed} tests passed in {total_time} seconds', 'g'))
 
