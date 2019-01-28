@@ -72,7 +72,7 @@ def get_failures(services, configs, versions):
     tests_passed = 0
 
     for service in services:
-        failure_msgs[service] = []  # empty failure message list for `service`
+        failure_msgs[service] = []  # empty failure message list for :param: `service`
         service_test_stats = {'passed': 0, 'failed': 0}  # for percentage output
 
         # Grab vulnerable templates and service file contents
@@ -94,11 +94,11 @@ def get_failures(services, configs, versions):
 
             if (config_exists(regex, config['type'], srv_file) and
                 (not config['prereq'] or
-                (config['prereq'] and check_prereqs(service,
-                                                    config['prereq'],
-                                                    config['prereq_type'],
-                                                    srv_file,
-                                                    flags)))):
+                    (config['prereq'] and check_prereqs(service,
+                                                        config['prereq'],
+                                                        config['prereq_type'],
+                                                        srv_file,
+                                                        flags)))):
                     test_status = 'failed'
 
                     if config['type'] == 'default':
