@@ -3,7 +3,7 @@ This page lists specific formatting instructions for sve entries.
 
 
 ## Layout
-*service_info.py* is divided into 4 sections.
+[*entries.py*](https://github.com/bl0nd/sve/blob/master/sve/entries.py) is divided into 4 sections.
 
 If you simply want to add a configuration entry for a service already covered by sve, [Entries](#entries) and [Templates](#templates) will be what you want to look at.
 
