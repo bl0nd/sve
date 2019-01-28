@@ -28,10 +28,6 @@ def create_parser():
     :return: A Namespace object containing the command-line flags
                and their state.
     :rtype: Namespace
-
-    TODO:
-        1. Handle bogus arguments passed. Right now it
-             just acts like you ran with no arguments.
     """
     parser = argparse.ArgumentParser()
 
@@ -54,16 +50,6 @@ def get_failures(services, configs, versions):
                                     its error message, and the number of
                                     passed tests.
     :rtype: dict, int
-
-    For defaults, we use their templates since if a default entry is matched,
-      that means we couldn't find the option in a safe state. So to create
-      the error line for a default entry, we must match either:
-
-          1) The entire config option in a vulnerable state.
-          2) The config option's name (in the case of implicit defaults).
-
-    TODO:
-        1. Multiple regex flags.
 
     FIXME:
         1. Having anonymous_enable=NO before anonymous_enable=YES.

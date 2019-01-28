@@ -265,7 +265,7 @@ def parse_services(services):
     """
     services = services.split(',')
 
-    unknown_services = set(services) - set(services_sve)
+    unknown_services = set(services) - set(services_common)
     if unknown_services:
         sys.exit(f"unknown services: {', '.join(unknown_services)}")
 
