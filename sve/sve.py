@@ -181,9 +181,10 @@ def show_failures(services, configs, versions, total_services):
         if any([fails for fails in failure_msgs.values()]):
             print(f"\n{header('FAILURES')}")
             for service, fails in failure_msgs.items():
-                print(f"{header(f'test_{service}', clr='r', border_type='_')}\n")
-                for error in fails:
-                    print(f'{error}\n')
+                if fails:
+                    print(f"{header(f'test_{service}', clr='r', border_type='_')}\n")
+                    for error in fails:
+                        print(f'{error}\n')
             print(header(f'{failed} tests failed, {passed} passed in {total_time} seconds', 'r'))
         # passed all tests
         else:
