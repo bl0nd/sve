@@ -13,16 +13,13 @@ import re
 import sys
 import subprocess as sp
 
-from .output import color, header
 from .entries import (
-        services_sve, services_actual, services_configs,
-        services_vuln_templates, services_norm_templates
+        services_common, services_actual, services_configs, services_templates
 )
 
 TERM_WIDTH = int(os.popen('stty size', 'r').read().split()[1])
 
 # PRINTING UTILITIES
-
 def color(message, clr='n'):
     """Color a message.
 
@@ -319,7 +316,7 @@ def get_error(service, name, desc, regex, srv_file, bad_line):
     :rtype: str
     """
     # It's always going to be a vulnerable default
-    vuln_templates = services_vuln_templates[service]
+    templates = services_templates[service]
 
     # Get line numbers
     line_nums = []
@@ -343,15 +340,13 @@ def check_prereqs(service, prereqs, prereq_types, srv_file, flags):
     :rtype: bool
     """
     satisfied = 0
-    vuln_templates = services_vuln_templates[service]
-    norm_templates = services_norm_templates[service]
+    templates = services_templates[service]
 
     if not prereqs:
         return
 
     for prereq, prereq_type in zip(prereqs, prereq_types):
         state, re_type = prereq_type.split()
-        templates = vuln_templates if state == 'vulnerable' else norm_templates
         if prereq_type == 'vulnerable explicit' or prereq_type == 'normal default':
             regex = re.compile(templates[prereq]['vuln'], flags=flags)
         elif prereq_type == 'vulnerable default' or prereq_type == 'normal explicit':

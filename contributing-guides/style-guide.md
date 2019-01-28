@@ -17,7 +17,7 @@ This section holds the common and actual names of services processed by sve. Act
 
 When adding a new service or operating system:
 
-1. Append the service's common name to `services_sve`.
+1. Append the service's common name to `services_common`.
 2. Update each operating system's service dictionary in `services_actual`. As a quick reference, the format of a `services_actual` entry is:
 
 ```python
@@ -75,9 +75,6 @@ For example, `anonymous_enable` can only be set to `YES` (vulnerable) or `NO` (s
   * For example, `anon_upload_enable` must be explicitly set to `YES`.
 * **default**: Indicates that the config option is in a vulnerable state by default.
   * For example, `anonymous_enable` is automatically set to `YES`.
-<!--* **special regex**: Indicates the config option type is explicit, but matching it relies on some regex magic and thus requires some special output processing on sve's side.-->
-  <!--* For example, `^local_umask=0[0-6][0-6]` is a special regex since in our test output we don't want to show `[0-6]` but the actual number matched.-->
-
 
 #### `regex`
 The `regex` field is a pattern allowing sve to determine if a vulnerable config option is set or not. How the pattern is constructed depends on your `type` specification:
@@ -121,11 +118,11 @@ Use cases 1 and 2 can be thought of as the same thing when submitting a new entr
 
 As for using templates for prerequisite checking, the regex depends on its type (set in `prereq_type`.
 
-There are 2 template structures:
-* `services_vuln_templates` holds patterns for config options that must be in a vulnerable state to satisfy any prerequisite requirements.
-* `services_norm_templates` holds patterns for config options that must be in a safe state to satisfy any prerequisite requirements.
+Templates go in the `services_templates` dictionary, which holds patterns for config options that are either:
+1. For enumerating line numbers and config option names.
+2. A prerequisite.
 
-Both of their formats are:
+Its format is as follows:
 ```python
 'common service name':
     {'short entry name (non-prereq)': 'regex pattern',

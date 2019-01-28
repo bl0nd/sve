@@ -17,7 +17,7 @@ When adding another OS, please use the name given in
 import re
 
 # NAMES
-services_sve = ['ftp', 'ssh']
+services_common = ['ftp', 'ssh']
 
 services_actual = {
     'Arch Linux':
@@ -344,20 +344,14 @@ If we're doing prerequisite checking, the regex used depends on
   normal default:      The config option is implicitly set to a
                          safe state.
 """
-services_vuln_templates = {
+services_templates = {
     'ftp':
         {'anon enable': {
             'vuln': '^anonymous_enable=YES',
             'safe': '^anonymous_enable=NO'
             },
          # not a prereq
-         'banner': '^(ftpd_banner|banner_file)',  # since we only get here if ftpd_banner isn't set,
-                                                  # we can just set it to ftpd_banner so it always just
-                                                  # shows the config option name
-         #  This is here b/c if it were an ND, local_umask would
-         #    only show if local_enable=YES wasn't in the file.
-         #    And it couldn't be a NE since that would look for
-         #    local_enable=NO as prereq confirmation.
+         'banner': '^(ftpd_banner|banner_file)',
          'local enable': {
             'vuln': '^local_enable=YES',
             'safe': '^local_enable=NO'
@@ -378,24 +372,7 @@ services_vuln_templates = {
              },
          # not a prereq
          'client alive interval': '^ClientAliveInterval\s+0',
-        },
-    # 'apache':
-        # {
-        # },
-}
-
-services_norm_templates = {
-    'ftp':
-        {
-        },
-    'ssh':
-        # This is here and not local_enable because if it were a VE,
-        #   and Protocol 1 was set, then PubkeyAuthentication would
-        #   show up. Since it's a ND, PubkeyAuthentication will only
-        #   show up if there's no match for Protocol 1. We can't have
-        #   it as a VD either cause that wouldn't make any sense as
-        #   the key values would be flipped flopped.
-        {'protocol 2': {
+         'protocol 2': {
              'vuln': '^protocol\s+1',
              'safe': '^protocol\s+(1,)?2(1,)?'
              },
@@ -404,4 +381,3 @@ services_norm_templates = {
         # {
         # },
 }
-

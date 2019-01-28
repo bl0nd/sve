@@ -19,9 +19,7 @@ from .utils import (
         show_collection_count, show_service_info, config_exists, check_prereqs,
         get_error, show_test_status, show_percentage, parse_services
 )
-from .entries import (
-        services_sve, services_entries, services_vuln_templates
-)
+from .entries import services_entries, services_templates
 
 
 def create_parser():
@@ -79,7 +77,7 @@ def get_failures(services, configs, versions):
 
         # Grab vulnerable templates and service file contents
         #   for default entries and regex matching
-        vuln_templates = services_vuln_templates[service]
+        templates = services_templates[service]
         with open(configs[service], 'r') as f:
             srv_file = f.read()
 
@@ -104,7 +102,7 @@ def get_failures(services, configs, versions):
                     test_status = 'failed'
 
                     if config['type'] == 'default':
-                        regex = re.compile(vuln_templates[name]['vuln'], flags=flags)
+                        regex = re.compile(templates[name]['vuln'], flags=flags)
                         match = re.findall(regex, srv_file)
 
                         # If template matches, use the match
@@ -113,7 +111,7 @@ def get_failures(services, configs, versions):
                             bad_line = color(f"E   {match}", "r")
                         # Otherwise, use the config option name
                         else:
-                            match = re.findall(r'[a-zA-Z_]+', vuln_templates[name]['vuln'])[0]
+                            match = re.findall(r'[a-zA-Z_]+', templates[name]['vuln'])[0]
                             bad_line = color(f"E   implicit: {match}", "r")
                     elif config['type'] == 'explicit':
                         match = re.findall(regex, srv_file)[0]
