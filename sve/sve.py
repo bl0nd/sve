@@ -17,7 +17,7 @@ from .output import color, header
 from .utils import (
         get_os, get_existing, get_active, get_configs, get_versions,
         show_collection_count, show_service_info, config_exists, check_prereqs,
-        get_error, show_test_status, show_percentage
+        get_error, show_test_status, show_percentage, parse_services
 )
 from .entries import (
         services_sve, services_entries, services_vuln_templates
@@ -44,22 +44,6 @@ def create_parser():
                         help='Specifies services to enumerate')
 
     return parser.parse_args()
-
-
-def parse_services(services):
-    """Parse provided services into a list.
-
-    :param services: String of comma-delimited services.
-    :return services: List of services.
-    :rtype: list
-    """
-    services = services.split(',')
-
-    unknown_services = set(services) - set(services_sve)
-    if unknown_services:
-        sys.exit(f"unknown services: {', '.join(unknown_services)}")
-
-    return services
 
 
 def get_failures(services, configs, versions):
