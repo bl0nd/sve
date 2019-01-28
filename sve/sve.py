@@ -12,7 +12,7 @@ import sys
 import time
 import argparse
 
-from . import __version__
+from . import __title__, __version__
 from .utils import (
         color, header,
         get_os, get_existing, get_active, get_configs, get_versions,
@@ -176,7 +176,7 @@ def main():
     args = create_parser()
 
     if args.version:
-        sys.exit(f'sve version {__version__}')
+        sys.exit(f'{__title__} version {__version__}')
 
     services = parse_services(args.services) if args.services else []
 
@@ -188,7 +188,7 @@ def main():
     versions = get_versions(distro, services)
 
     # Start tests
-    print(header('sve session starts'))
+    print(header(f'{__title__} session starts'))
     total_services = show_collection_count(services_entries)
     show_failures(existing_srvs, configs, versions, total_services)
 
